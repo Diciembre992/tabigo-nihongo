@@ -1,0 +1,522 @@
+---
+import { WRITING_CHARS } from '../data/japaneseData';
+
+function getCharLevel(idx: number): 'intro' | 'nivel-1' | 'nivel-2' | 'nivel-3' {
+  if (idx < 6) return 'intro';
+  if (idx < 10) return 'nivel-1';
+  if (idx < 13) return 'nivel-2';
+  return 'nivel-3';
+}
+---
+
+<section id="escritura" class="section-block dojo-section">
+  <div class="section-header">
+    <div class="section-tag">書 · ESCRITURA Y LECTURA DE SUPERVIVENCIA POR NIVELES</div>
+    <h2 class="section-title">Dojo de Caligrafía y Carteles Callejeros</h2>
+    <p class="section-subtitle">
+      Avanza por los <strong>4 Niveles de Trazado y Lectura</strong>: desde el <strong>Nivel 0 (Hiragana)</strong> y <strong>Nivel 1 (Katakana de menús)</strong> hasta los <strong>Niveles 2 y 3 (Kanji reales de estaciones, yenes y baños termales)</strong>.
+    </p>
+  </div>
+
+  <!-- Filtros por Nivel de Escritura -->
+  <div class="writing-type-tabs">
+    <button type="button" class="w-tab active" data-wtype="all">Todos ({WRITING_CHARS.length})</button>
+    <button type="button" class="w-tab" data-wtype="level:intro">🌱 Nivel 0 · Hiragana Base (6)</button>
+    <button type="button" class="w-tab" data-wtype="level:nivel-1">🍜 Nivel 1 · Katakana de Menús (4)</button>
+    <button type="button" class="w-tab" data-wtype="level:nivel-2">🚉 Nivel 2 · Kanji Estaciones (3)</button>
+    <button type="button" class="w-tab" data-wtype="level:nivel-3">♨️ Nivel 3 · Kanji Yenes y Onsen (3)</button>
+  </div>
+
+  <div class="dojo-layout">
+    <!-- Columna Izquierda: Selector de Caracteres y Explicación Visual -->
+    <div class="char-selector-panel">
+      <div class="chars-grid" id="writing-chars-grid">
+        {WRITING_CHARS.map((wc, idx) => (
+          <button
+            type="button"
+            class={`char-tile ${idx === 0 ? 'active' : ''}`}
+            data-char-index={idx}
+            data-char-id={wc.id}
+            data-char-type={wc.type}
+            data-char-level={getCharLevel(idx)}
+          >
+            <span class="tile-char">{wc.char}</span>
+            <span class="tile-romaji">{wc.romaji}</span>
+            <span class="tile-meaning">{wc.meaning.split(' ')[0]}</span>
+          </button>
+        ))}
+      </div>
+
+      <!-- Ficha de Lectura y Truco Mnemotécnico -->
+      <div class="char-detail-card">
+        <div class="detail-top">
+          <div>
+            <span class="detail-badge" id="char-type-badge">HIRAGANA</span>
+            <h3 class="detail-title" id="char-meaning-title">{WRITING_CHARS[0].meaning}</h3>
+          </div>
+          <button type="button" class="char-audio-btn" id="char-speak-btn">
+            🔊 Escuchar "{WRITING_CHARS[0].char}"
+          </button>
+        </div>
+
+        <p class="detail-phonetic">
+          🗣️ <strong>Sonido en español:</strong> <span id="char-phonetic">{WRITING_CHARS[0].esPhonetic}</span>
+        </p>
+
+        <p class="detail-mnemonic" id="char-mnemonic">
+          🧠 <strong>Truco visual para recordarlo:</strong> {WRITING_CHARS[0].mnemonic}
+        </p>
+
+        <!-- Cartel callejero simulado -->
+        <div class="street-sign-preview">
+          <div class="sign-label">Así lo verás en un cartel o menú en Japón:</div>
+          <div class="sign-board" id="char-sign-board">
+            <span class="sign-jp" id="char-example-jp">{WRITING_CHARS[0].exampleWord.jp}</span>
+            <div class="sign-meta">
+              <strong id="char-example-romaji">{WRITING_CHARS[0].exampleWord.romaji}</strong>
+              <span id="char-example-es">{WRITING_CHARS[0].exampleWord.es}</span>
+            </div>
+            <button type="button" class="sign-speak-mini" id="char-example-speak">🔊</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Lienzo de Papel Washi para Trazar con Pincel Sumi -->
+    <div class="canvas-board-card">
+      <div class="canvas-header">
+        <div>
+          <span class="canvas-subtitle">TALLER SHODŌ · TRAZADO INTERACTIVO</span>
+          <h4>Dibuja el carácter con tu ratón o dedo</h4>
+        </div>
+        <div class="stroke-count-badge" id="stroke-count-badge">
+          3 trazos
+        </div>
+      </div>
+
+      <div class="canvas-wrapper">
+        <!-- Guía de cuadrícula tradicional japonesa (Genkō yōshi) + Trazos SVG -->
+        <svg class="guide-svg" viewBox="0 0 100 100" id="stroke-guide-svg" aria-hidden="true">
+          <line x1="50" y1="0" x2="50" y2="100" class="grid-line" />
+          <line x1="0" y1="50" x2="100" y2="50" class="grid-line" />
+          <g id="svg-strokes-group"></g>
+        </svg>
+
+        <canvas id="shodo-canvas" width="340" height="340"></canvas>
+
+        <!-- Sello Rojo que aparece al validar el trazo -->
+        <div class="canvas-hanko-overlay" id="canvas-hanko-reward" hidden>
+          <div class="hanko-stamp stamp-animate">書</div>
+          <span>¡Trazo Sellado! +20 XP</span>
+        </div>
+      </div>
+
+      <div class="canvas-toolbar">
+        <button type="button" class="tool-btn" id="animate-strokes-btn">
+          ✨ Ver Orden de Trazos
+        </button>
+        <button type="button" class="tool-btn" id="toggle-guide-btn">
+          👁️ Guía: Visible
+        </button>
+        <button type="button" class="tool-btn" id="clear-canvas-btn">
+          🧹 Limpiar Papel
+        </button>
+        <button type="button" class="tool-btn primary-verify-btn" id="verify-stroke-btn">
+          💮 Sellar mi Caligrafía (+20 XP)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" id="writing-data" set:html={JSON.stringify(WRITING_CHARS)}></script>
+</section>
+
+<style>
+  .dojo-section {
+    padding: 0.5rem 0;
+  }
+
+  .section-header {
+    margin-bottom: 1.5rem;
+    max-width: 720px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--md-secondary);
+    background: var(--md-secondary-container);
+    padding: 0.25rem 0.7rem;
+    border-radius: var(--radius-pill);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-subtitle {
+    color: var(--md-on-surface-variant);
+    font-size: 0.94rem;
+  }
+
+  .writing-type-tabs {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+  }
+
+  .w-tab {
+    padding: 0.55rem 1.05rem;
+    border-radius: 99px;
+    border: 1.5px solid var(--washi-border);
+    background: var(--washi-card);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--sumi-muted);
+    transition: all 0.2s ease;
+  }
+
+  .w-tab.active {
+    background: var(--sumi-ink);
+    color: var(--washi-bg);
+    border-color: var(--sumi-ink);
+  }
+
+  .dojo-layout {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .char-selector-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.35rem;
+  }
+
+  .chars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: 0.6rem;
+  }
+
+  .char-tile {
+    background: var(--washi-card);
+    border: 1.5px solid var(--washi-border);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.35rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    transition: all 0.18s ease;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .char-tile:hover {
+    border-color: var(--sumi-ink);
+    transform: translateY(-2px);
+  }
+
+  .char-tile.active {
+    border-color: var(--hanko-red);
+    background: var(--md-blush);
+    box-shadow: 0 0 0 2px rgba(200, 62, 43, 0.15);
+  }
+
+  .char-tile.practiced {
+    border-color: var(--matcha-green);
+  }
+
+  .tile-char {
+    font-family: var(--font-serif-jp);
+    font-size: 1.65rem;
+    font-weight: 900;
+    color: var(--sumi-ink);
+    line-height: 1.1;
+  }
+
+  .tile-romaji {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--hanko-red);
+  }
+
+  .tile-meaning {
+    font-size: 0.66rem;
+    color: var(--sumi-muted);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .char-detail-card {
+    background: var(--washi-card);
+    border: 1px solid var(--washi-border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .detail-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .detail-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--matcha-green);
+    background: var(--matcha-soft);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .detail-title {
+    font-family: var(--font-serif-jp);
+    font-size: 1.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .char-audio-btn {
+    background: var(--sumi-ink);
+    color: var(--washi-bg);
+    padding: 0.45rem 0.9rem;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .char-audio-btn:hover {
+    background: var(--hanko-red);
+  }
+
+  .detail-phonetic,
+  .detail-mnemonic {
+    font-size: 0.9rem;
+    color: var(--sumi-ink);
+  }
+
+  .street-sign-preview {
+    margin-top: 0.35rem;
+    background: var(--washi-bg);
+    border: 1px solid var(--washi-border);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem;
+  }
+
+  .sign-label {
+    font-size: 0.74rem;
+    color: var(--sumi-muted);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .sign-board {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1C1917;
+    color: #FAF6F0;
+    padding: 0.75rem 1.1rem;
+    border-radius: 6px;
+    border-left: 5px solid #EAB308;
+  }
+
+  .sign-jp {
+    font-family: var(--font-sans-jp);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #FDE047;
+  }
+
+  .sign-meta {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.82rem;
+  }
+
+  .sign-speak-mini {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 0.95rem;
+  }
+
+  /* Lienzo de Caligrafía */
+  .canvas-board-card {
+    background: var(--washi-card);
+    border: 1.5px solid var(--washi-border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-elevated);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+  }
+
+  .canvas-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .canvas-subtitle {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--hanko-red);
+  }
+
+  .canvas-header h4 {
+    font-family: var(--font-serif-jp);
+    font-size: 1.05rem;
+  }
+
+  .stroke-count-badge {
+    background: var(--washi-warm);
+    padding: 0.25rem 0.65rem;
+    border-radius: 99px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--sumi-muted);
+  }
+
+  .canvas-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 1 / 1;
+    background: #FFFDF8;
+    border: 2px solid #D6CBB9;
+    border-radius: 12px;
+    box-shadow: inset 0 2px 10px rgba(28, 25, 23, 0.05);
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .guide-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .grid-line {
+    stroke: #E6DEC8;
+    stroke-width: 0.7;
+    stroke-dasharray: 3, 3;
+  }
+
+  :global(.guide-stroke-path) {
+    fill: none;
+    stroke: rgba(200, 62, 43, 0.22);
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  :global(.guide-stroke-anim) {
+    stroke: rgba(200, 62, 43, 0.65);
+    stroke-dasharray: 120;
+    stroke-dashoffset: 120;
+    animation: drawStroke 0.9s ease forwards;
+  }
+
+  @keyframes drawStroke {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  #shodo-canvas {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+  }
+
+  .canvas-hanko-overlay {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    z-index: 5;
+    background: rgba(255, 253, 249, 0.94);
+    border: 1px solid var(--hanko-red);
+    border-radius: 8px;
+    padding: 0.45rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--hanko-red);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .canvas-toolbar {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.55rem;
+  }
+
+  .tool-btn {
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--washi-border);
+    background: var(--washi-bg);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--sumi-ink);
+    transition: all 0.15s ease;
+  }
+
+  .tool-btn:hover {
+    border-color: var(--sumi-ink);
+    background: var(--washi-warm);
+  }
+
+  .primary-verify-btn {
+    grid-column: span 2;
+    background: var(--hanko-red);
+    color: var(--md-on-primary);
+    border-color: var(--hanko-red);
+    padding: 0.75rem;
+    font-size: 0.88rem;
+  }
+
+  .primary-verify-btn:hover {
+    background: #A82E1E;
+    color: white;
+  }
+
+  @media (max-width: 920px) {
+    .dojo-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+

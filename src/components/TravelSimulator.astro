@@ -1,0 +1,496 @@
+---
+import { TRAVEL_SCENARIOS } from '../data/japaneseData';
+---
+
+<section id="simulaciones" class="section-block sim-section">
+  <div class="section-header">
+    <div class="section-tag">旅 · SIMULADOR DE CONVERSACIONES REALES</div>
+    <h2 class="section-title">Entrena Situaciones Reales Antes de Aterrizar</h2>
+    <p class="section-subtitle">
+      Escucha lo que te dirán los empleados en Japón, responde eligiendo o pronunciando la frase adecuada y colecciona el <strong>Sello Goshuin</strong> de cada lugar.
+    </p>
+  </div>
+
+  <!-- Selector de Escenarios -->
+  <div class="scenario-cards-nav" id="scenario-selector">
+    {TRAVEL_SCENARIOS.map((scen, idx) => (
+      <button
+        type="button"
+        class={`scenario-tab-card ${idx === 0 ? 'active' : ''}`}
+        data-scenario-index={idx}
+        data-scenario-id={scen.id}
+      >
+        <div class="scen-top">
+          <span class="scen-diff">{scen.difficulty}</span>
+          <div class="scen-mini-stamp" data-scen-stamp={scen.id}>{scen.stampKanji}</div>
+        </div>
+        <h3 class="scen-title">{scen.title}</h3>
+        <span class="scen-loc">📍 {scen.location}</span>
+      </button>
+    ))}
+  </div>
+
+  <!-- Teatro de Conversación Activo -->
+  <div class="sim-stage-card" id="sim-stage">
+    <div class="stage-topbar">
+      <div class="stage-loc-info">
+        <span class="stage-jp-title" id="sim-jp-title">{TRAVEL_SCENARIOS[0].jpTitle}</span>
+        <h3 id="sim-title">{TRAVEL_SCENARIOS[0].title}</h3>
+      </div>
+
+      <div class="stage-controls">
+        <label class="blind-listen-toggle" title="Oculta el español al principio para entrenar el oído">
+          <input type="checkbox" id="blind-mode-checkbox" />
+          <span>👂 Modo Oído (ocultar traducción)</span>
+        </label>
+        <div class="step-Dots" id="sim-step-indicator">Paso 1 de 3</div>
+      </div>
+    </div>
+
+    <div class="stage-body">
+      <!-- Burbuja del Empleado Japonés -->
+      <div class="npc-row">
+        <div class="npc-avatar">
+          <span class="avatar-emoji" id="npc-emoji">🏪</span>
+          <span class="avatar-role">Staff JP</span>
+        </div>
+
+        <div class="npc-bubble">
+          <div class="npc-bubble-header">
+            <span class="npc-kana" id="npc-kana">{TRAVEL_SCENARIOS[0].steps[0].staffKana}</span>
+            <button type="button" class="npc-replay-btn" id="npc-speak-btn">
+              🔊 Escuchar empleado
+            </button>
+          </div>
+          <p class="npc-jp" id="npc-jp">{TRAVEL_SCENARIOS[0].steps[0].staffJp}</p>
+          <p class="npc-romaji" id="npc-romaji">{TRAVEL_SCENARIOS[0].steps[0].staffRomaji}</p>
+          <p class="npc-es" id="npc-es">{TRAVEL_SCENARIOS[0].steps[0].staffEs}</p>
+
+          <div class="context-whisper" id="npc-context">
+            💡 <strong>Pista de viajero:</strong> {TRAVEL_SCENARIOS[0].steps[0].contextNote}
+          </div>
+        </div>
+      </div>
+
+      <!-- Opciones de Respuesta del Viajero -->
+      <div class="player-response-area">
+        <h4 class="response-prompt">Tu turno de responder (elige o pronuncia en voz alta):</h4>
+        <div class="response-options-grid" id="sim-options-container">
+          <!-- Renderizado dinámico por JS -->
+        </div>
+
+        <div class="sim-feedback-banner" id="sim-feedback-banner" hidden>
+          <div class="feedback-content">
+            <p id="sim-feedback-text"></p>
+            <div class="feedback-actions">
+              <button type="button" class="btn-practice-choice" id="sim-mic-practice-btn">
+                🎙️ Practicar pronunciación de mi respuesta
+              </button>
+              <button type="button" class="btn-next-step" id="sim-next-btn">
+                Continuar conversación →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Datos JSON embebidos para interactividad instantánea -->
+  <script type="application/json" id="scenarios-data" set:html={JSON.stringify(TRAVEL_SCENARIOS)}></script>
+</section>
+
+<style>
+  .sim-section {
+    padding: 0.5rem 0;
+  }
+
+  .section-header {
+    margin-bottom: 1.5rem;
+    max-width: 680px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--md-primary);
+    background: var(--md-primary-container);
+    padding: 0.25rem 0.7rem;
+    border-radius: var(--radius-pill);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-subtitle {
+    color: var(--md-on-surface-variant);
+    font-size: 0.94rem;
+  }
+
+  .scenario-cards-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .scenario-tab-card {
+    background: var(--washi-card);
+    border: 1.5px solid var(--washi-border);
+    border-radius: var(--radius-md);
+    padding: 1.15rem 1.25rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .scenario-tab-card:hover {
+    border-color: var(--sumi-ink);
+    transform: translateY(-2px);
+  }
+
+  .scenario-tab-card.active {
+    border-color: var(--hanko-red);
+    background: var(--md-grad-rose);
+    box-shadow: 0 0 0 2px rgba(200, 62, 43, 0.14);
+  }
+
+  .scen-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .scen-diff {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--matcha-green);
+    background: var(--matcha-soft);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .scen-mini-stamp {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px dashed var(--washi-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif-jp);
+    font-weight: 900;
+    font-size: 0.95rem;
+    color: var(--md-faint);
+  }
+
+  .scen-mini-stamp.stamped {
+    border: 2px solid var(--hanko-red);
+    color: var(--hanko-red);
+    background: var(--hanko-red-soft);
+    transform: rotate(-8deg);
+  }
+
+  .scen-title {
+    font-family: var(--font-serif-jp);
+    font-size: 1.05rem;
+    color: var(--sumi-ink);
+  }
+
+  .scen-loc {
+    font-size: 0.78rem;
+    color: var(--sumi-muted);
+  }
+
+  /* Stage Card */
+  .sim-stage-card {
+    background: var(--washi-card);
+    border: 1.5px solid var(--washi-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .stage-topbar {
+    background: var(--washi-warm);
+    border-bottom: 1px solid var(--washi-border);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .stage-jp-title {
+    font-size: 0.75rem;
+    color: var(--hanko-red);
+    font-weight: 700;
+  }
+
+  .stage-loc-info h3 {
+    font-family: var(--font-serif-jp);
+    font-size: 1.25rem;
+  }
+
+  .stage-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .blind-listen-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--sumi-muted);
+    cursor: pointer;
+  }
+
+  .step-Dots {
+    background: var(--sumi-ink);
+    color: var(--washi-bg);
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.25rem 0.7rem;
+    border-radius: 99px;
+  }
+
+  .stage-body {
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .npc-row {
+    display: flex;
+    gap: 1.15rem;
+    align-items: flex-start;
+  }
+
+  .npc-avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 68px;
+  }
+
+  .avatar-emoji {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--washi-warm);
+    border: 2px solid var(--washi-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+  }
+
+  .avatar-role {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--sumi-muted);
+  }
+
+  .npc-bubble {
+    flex: 1;
+    background: var(--washi-bg);
+    border: 1px solid var(--washi-border);
+    border-radius: 4px 16px 16px 16px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .npc-bubble-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .npc-kana {
+    font-size: 0.8rem;
+    color: var(--sumi-muted);
+  }
+
+  .npc-replay-btn {
+    background: var(--sumi-ink);
+    color: var(--washi-bg);
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.35rem 0.75rem;
+    border-radius: 99px;
+  }
+
+  .npc-replay-btn:hover {
+    background: var(--hanko-red);
+  }
+
+  .npc-jp {
+    font-family: var(--font-serif-jp);
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: var(--sumi-ink);
+  }
+
+  .npc-romaji {
+    font-size: 0.86rem;
+    color: var(--hanko-red);
+    font-weight: 600;
+  }
+
+  .npc-es {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--matcha-green);
+    transition: filter 0.25s ease;
+  }
+
+  .npc-es.blurred {
+    filter: blur(6px);
+    user-select: none;
+  }
+
+  .npc-es.blurred:hover {
+    filter: blur(0);
+  }
+
+  .context-whisper {
+    margin-top: 0.45rem;
+    padding-top: 0.55rem;
+    border-top: 1px dashed var(--washi-border);
+    font-size: 0.82rem;
+    color: var(--sumi-muted);
+  }
+
+  .response-prompt {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--sumi-muted);
+    margin-bottom: 0.85rem;
+  }
+
+  .response-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  :global(.sim-option-btn) {
+    background: var(--washi-bg);
+    border: 1.5px solid var(--washi-border);
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.25rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  :global(.sim-option-btn:hover) {
+    border-color: var(--sumi-ink);
+    background: var(--md-paper);
+    transform: translateY(-2px);
+  }
+
+  :global(.sim-option-btn.correct-choice) {
+    border-color: var(--matcha-green);
+    background: var(--matcha-soft);
+  }
+
+  :global(.sim-option-btn.wrong-choice) {
+    border-color: var(--hanko-red);
+    background: var(--hanko-red-soft);
+  }
+
+  :global(.opt-jp) {
+    font-family: var(--font-serif-jp);
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--sumi-ink);
+  }
+
+  :global(.opt-phonetic) {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--hanko-red);
+  }
+
+  :global(.opt-meaning) {
+    font-size: 0.85rem;
+    color: var(--sumi-muted);
+  }
+
+  .sim-feedback-banner {
+    margin-top: 1.25rem;
+    padding: 1.15rem 1.35rem;
+    border-radius: var(--radius-md);
+    background: var(--washi-warm);
+    border-left: 4px solid var(--matcha-green);
+  }
+
+  .feedback-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .feedback-actions {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-practice-choice {
+    padding: 0.55rem 0.95rem;
+    border-radius: 6px;
+    border: 1px solid var(--sumi-ink);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--sumi-ink);
+    background: var(--washi-card);
+  }
+
+  .btn-next-step {
+    padding: 0.55rem 1.1rem;
+    border-radius: 6px;
+    background: var(--hanko-red);
+    color: var(--md-on-primary);
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  @media (max-width: 820px) {
+    .scenario-cards-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .npc-row {
+      flex-direction: column;
+    }
+  }
+</style>
+

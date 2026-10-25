@@ -1,0 +1,247 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="TabiGo (旅語) - Aprende japonés básico paso a paso para tu viaje." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#FBF9F5" id="meta-theme-color" />
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('tabigo-theme');
+          var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+          var m = document.getElementById('meta-theme-color');
+          if (m) m.setAttribute('content', theme === 'dark' ? '#14110F' : '#FBF9F5');
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    /* Material 3 (Material You) + Warm Oriental Washi Palette */
+    --md-bg: #FBF9F5;
+    --md-surface: #FFFFFF;
+    --md-surface-low: #F5F1EA;
+    --md-surface-container: #EFEAE1;
+    --md-surface-high: #E6DFD3;
+    --md-outline: #D8D0C2;
+    --md-outline-variant: #E9E2D6;
+
+    /* Text / Sumi Ink */
+    --md-on-surface: #1D1B18;
+    --md-on-surface-variant: #5E5A52;
+    --md-muted: #857F75;
+
+    /* Primary: Vermilion Torii / Hanko */
+    --md-primary: #B93829;
+    --md-on-primary: #FFFFFF;
+    --md-primary-container: #FCEAE6;
+    --md-on-primary-container: #410E08;
+
+    /* Secondary: Matcha Sage */
+    --md-secondary: #3B644C;
+    --md-secondary-container: #E1EFE6;
+    --md-on-secondary-container: #0F291A;
+
+    /* Tertiary: Kintsugi Amber */
+    --md-tertiary: #8F6414;
+    --md-tertiary-container: #F9ECCF;
+
+    /* Legacy aliases for components */
+    --washi-bg: var(--md-bg);
+    --washi-card: var(--md-surface);
+    --washi-warm: var(--md-surface-low);
+    --washi-border: var(--md-outline-variant);
+    --sumi-ink: var(--md-on-surface);
+    --sumi-muted: var(--md-on-surface-variant);
+    --sumi-light: var(--md-muted);
+    --hanko-red: var(--md-primary);
+    --hanko-red-soft: var(--md-primary-container);
+    --matcha-green: var(--md-secondary);
+    --matcha-soft: var(--md-secondary-container);
+    --kintsugi-gold: var(--md-tertiary);
+    --kintsugi-soft: var(--md-tertiary-container);
+
+    /* Material 3 Elevations & Radii */
+    --shadow-soft: 0 2px 10px rgba(29, 27, 24, 0.04);
+    --shadow-elevated: 0 8px 28px rgba(29, 27, 24, 0.07);
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --radius-pill: 999px;
+
+    --font-serif-jp: 'Noto Serif JP', serif;
+    --font-sans-jp: 'Noto Sans JP', sans-serif;
+    --font-ui: 'Plus Jakarta Sans', 'Noto Sans JP', system-ui, sans-serif;
+
+    /* Superficies cálidas reutilizables (adaptadas en modo oscuro) */
+    --md-paper: #FFFDF9;
+    --md-blush: #FFF6F4;
+    --md-faint: #C7BFB3;
+    --md-glass: rgba(255, 255, 255, 0.75);
+    --md-header-glass: rgba(251, 249, 245, 0.88);
+    --md-grad-amber: linear-gradient(135deg, #FFFDF9 0%, #F9ECCF 100%);
+    --md-grad-sand: linear-gradient(135deg, #FFFDF9 0%, #FAF3E8 100%);
+    --md-grad-rose: linear-gradient(135deg, #FFFDF9 0%, #FFF5F2 100%);
+  }
+
+  /* ===== MODO OSCURO · Sumi (tinta) nocturno con acentos Hanko y Matcha ===== */
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+
+    --md-bg: #14110F;
+    --md-surface: #1E1A17;
+    --md-surface-low: #26211D;
+    --md-surface-container: #2E2924;
+    --md-surface-high: #38322C;
+    --md-outline: #4F473F;
+    --md-outline-variant: #3A332D;
+
+    --md-on-surface: #F2ECE2;
+    --md-on-surface-variant: #C4BCAF;
+    --md-muted: #9A9286;
+
+    --md-primary: #F08A78;
+    --md-on-primary: #3A0C05;
+    --md-primary-container: #4A1F18;
+    --md-on-primary-container: #FFDAD3;
+
+    --md-secondary: #8FC7A4;
+    --md-secondary-container: #1F3A2A;
+    --md-on-secondary-container: #CDEBD8;
+
+    --md-tertiary: #E3B65C;
+    --md-tertiary-container: #40300F;
+
+    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
+    --shadow-elevated: 0 8px 28px rgba(0, 0, 0, 0.5);
+
+    --md-paper: #24201C;
+    --md-blush: #2E1E1B;
+    --md-faint: #6B635A;
+    --md-glass: rgba(38, 33, 29, 0.78);
+    --md-header-glass: rgba(20, 17, 15, 0.88);
+    --md-grad-amber: linear-gradient(135deg, #24201C 0%, #3A2E14 100%);
+    --md-grad-sand: linear-gradient(135deg, #24201C 0%, #2D2822 100%);
+    --md-grad-rose: linear-gradient(135deg, #24201C 0%, #33201C 100%);
+  }
+
+  :root[data-theme='dark'] .hanko-stamp {
+    color: #FFDAD3;
+    border-color: #F08A78;
+    background: #4A1F18;
+  }
+
+  /* El papel de caligrafía se mantiene claro para que la tinta negra se vea */
+  :root[data-theme='dark'] .canvas-wrapper {
+    background: #FFFDF8;
+  }
+
+  /* Botón de tema (claro / oscuro) */
+  .theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--md-outline-variant);
+    background: var(--md-surface);
+    color: var(--md-on-surface);
+    font-size: 1.05rem;
+    line-height: 1;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .theme-toggle-btn:hover {
+    background: var(--md-surface-container);
+    transform: rotate(18deg);
+  }
+
+  html,
+  body,
+  .theme-toggle-btn {
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: var(--font-ui);
+    background-color: var(--md-bg);
+    color: var(--md-on-surface);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+
+  /* Minimalist Oriental Hanko Seal */
+  .hanko-stamp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--md-primary);
+    border-radius: 10px;
+    color: var(--md-primary);
+    font-family: var(--font-serif-jp);
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 1;
+    background: var(--md-primary-container);
+    user-select: none;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  @keyframes fadeSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .view-animate {
+    animation: fadeSlideUp 0.3s cubic-bezier(0.2, 0, 0, 1) forwards;
+  }
+</style>

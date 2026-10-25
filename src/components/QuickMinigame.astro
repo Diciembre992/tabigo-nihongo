@@ -1,0 +1,452 @@
+---
+---
+
+<section id="minijuego" class="section-block minigame-section">
+  <div class="section-header">
+    <div class="section-tag">速 · ENTRENAMIENTO DE REFLEJOS</div>
+    <h2 class="section-title">Reto Expreso Yamanote y Flashcards Zen</h2>
+    <p class="section-subtitle">
+      En el metro de Tokio o frente al mostrador de un restaurante no tienes tiempo de buscar en el diccionario. Pon a prueba tus reflejos de lectura y oído para conseguir el sello <strong>Expreso Yamanote (速)</strong>.
+    </p>
+  </div>
+
+  <div class="game-mode-switcher">
+    <button type="button" class="mode-btn active" id="mode-quiz-btn">
+      ⚡ Quiz Expreso Yamanote (Racha de Reflejos)
+    </button>
+    <button type="button" class="mode-btn" id="mode-flashcard-btn">
+      🃏 Modo Flashcards Zen (Repaso con Giro)
+    </button>
+  </div>
+
+  <!-- Selector de Nivel para el Reto Yamanote y Flashcards -->
+  <div class="quiz-level-pills" role="tablist" aria-label="Nivel del reto">
+    <button type="button" class="q-lvl-pill active" data-quiz-level="all">⛩️ Todos los niveles (28)</button>
+    <button type="button" class="q-lvl-pill" data-quiz-level="intro">🌱 Nivel 0 · Intro (7)</button>
+    <button type="button" class="q-lvl-pill" data-quiz-level="nivel-1">🍜 Nivel 1 · Básico (7)</button>
+    <button type="button" class="q-lvl-pill" data-quiz-level="nivel-2">🚅 Nivel 2 · Intermedio (7)</button>
+    <button type="button" class="q-lvl-pill" data-quiz-level="nivel-3">🏯 Nivel 3 · Avanzado (7)</button>
+  </div>
+
+  <!-- MODO 1: QUIZ EXPRESO YAMANOTE -->
+  <div class="quiz-arena-card" id="quiz-arena">
+    <div class="arena-topbar">
+      <div class="combo-pill">
+        <span>🔥 Racha actual:</span>
+        <strong id="quiz-combo-count">0</strong>
+        <span class="combo-goal">(Meta: 5 para Sello 速)</span>
+      </div>
+
+      <div class="score-pill">
+        <span>Aciertos: <strong id="quiz-score-count">0</strong></span>
+      </div>
+    </div>
+
+    <div class="quiz-question-box">
+      <span class="q-prompt-type" id="quiz-prompt-type">¿Qué significa y cómo suena esta expresión?</span>
+      <div class="q-main-row">
+        <h3 class="q-jp-display" id="quiz-jp-text">すみません</h3>
+        <button type="button" class="q-audio-btn" id="quiz-listen-btn" title="Escuchar pronunciación">
+          🔊 Escuchar
+        </button>
+      </div>
+      <span class="q-phonetic-hint" id="quiz-phonetic-hint">Pronunciación: "Su-mi-ma-sén"</span>
+    </div>
+
+    <div class="quiz-options-grid" id="quiz-options-grid">
+      <!-- Opciones generadas dinámicamente -->
+    </div>
+
+    <div class="quiz-status-msg" id="quiz-status-msg">
+      Selecciona la respuesta correcta para encadenar tu racha.
+    </div>
+  </div>
+
+  <!-- MODO 2: FLASHCARDS ZEN -->
+  <div class="flashcard-arena" id="flashcard-arena" hidden>
+    <div class="fc-counter" id="fc-counter">Tarjeta 1 de 15</div>
+
+    <div class="flashcard-3d-wrapper" id="flashcard-card">
+      <div class="fc-face fc-front">
+        <span class="fc-hint">Haz clic para girar la tarjeta ↻</span>
+        <span class="fc-kana" id="fc-kana">すみません</span>
+        <h3 class="fc-jp" id="fc-jp">すみません</h3>
+        <button type="button" class="fc-speak-btn" id="fc-speak-btn">🔊 Escuchar pronunciación</button>
+      </div>
+
+      <div class="fc-face fc-back">
+        <span class="fc-tag">PRONUNCIACIÓN EN ESPAÑOL</span>
+        <h4 class="fc-phonetic" id="fc-phonetic">"Su-mi-ma-sén"</h4>
+        <p class="fc-meaning" id="fc-meaning">Disculpe / Perdón / Gracias</p>
+        <p class="fc-tip" id="fc-tip"></p>
+      </div>
+    </div>
+
+    <div class="fc-controls">
+      <button type="button" class="fc-nav-btn" id="fc-prev-btn">← Anterior</button>
+      <button type="button" class="fc-flip-btn" id="fc-flip-btn">🔄 Girar Tarjeta</button>
+      <button type="button" class="fc-know-btn" id="fc-know-btn">✅ ¡La pronuncié bien! (+15 XP)</button>
+      <button type="button" class="fc-nav-btn" id="fc-next-btn">Siguiente →</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .minigame-section {
+    padding: 0.5rem 0;
+  }
+
+  .section-header {
+    margin-bottom: 1.5rem;
+    max-width: 680px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--md-tertiary);
+    background: var(--md-tertiary-container);
+    padding: 0.25rem 0.7rem;
+    border-radius: var(--radius-pill);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-subtitle {
+    color: var(--md-on-surface-variant);
+    font-size: 0.94rem;
+  }
+
+  .game-mode-switcher {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+  }
+
+  .mode-btn {
+    padding: 0.65rem 1.25rem;
+    border-radius: 99px;
+    border: 1.5px solid var(--washi-border);
+    background: var(--washi-card);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--sumi-muted);
+    transition: all 0.2s ease;
+  }
+
+  .mode-btn.active {
+    background: var(--sumi-ink);
+    color: var(--washi-bg);
+    border-color: var(--sumi-ink);
+  }
+
+  .quiz-level-pills {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+
+  .q-lvl-pill {
+    padding: 0.42rem 0.9rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--md-outline-variant);
+    background: var(--md-surface);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--md-on-surface-variant);
+    transition: all 0.16s ease;
+  }
+
+  .q-lvl-pill.active {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border-color: var(--md-primary);
+  }
+
+  .quiz-arena-card {
+    background: var(--washi-card);
+    border: 1.5px solid var(--washi-border);
+    border-radius: var(--radius-lg);
+    padding: 1.85rem;
+    box-shadow: var(--shadow-elevated);
+    max-width: 860px;
+  }
+
+  .arena-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--washi-border);
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .combo-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    background: var(--md-blush);
+    border: 1px solid rgba(200, 62, 43, 0.3);
+    padding: 0.35rem 0.85rem;
+    border-radius: 99px;
+  }
+
+  .combo-pill strong {
+    font-size: 1.15rem;
+    color: var(--hanko-red);
+  }
+
+  .combo-goal {
+    font-size: 0.75rem;
+    color: var(--sumi-muted);
+  }
+
+  .score-pill {
+    font-size: 0.88rem;
+    color: var(--sumi-muted);
+  }
+
+  .quiz-question-box {
+    text-align: center;
+    background: var(--washi-bg);
+    border: 1px solid var(--washi-border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .q-prompt-type {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sumi-muted);
+  }
+
+  .q-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 0.65rem 0;
+    flex-wrap: wrap;
+  }
+
+  .q-jp-display {
+    font-family: var(--font-serif-jp);
+    font-size: 2.3rem;
+    font-weight: 900;
+    color: var(--sumi-ink);
+  }
+
+  .q-audio-btn {
+    background: var(--sumi-ink);
+    color: var(--washi-bg);
+    padding: 0.45rem 0.9rem;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .q-phonetic-hint {
+    display: inline-block;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--kintsugi-gold);
+    background: var(--kintsugi-soft);
+    padding: 0.2rem 0.7rem;
+    border-radius: 6px;
+  }
+
+  .quiz-options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+
+  :global(.quiz-opt-btn) {
+    background: var(--washi-bg);
+    border: 1.5px solid var(--washi-border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.15rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--sumi-ink);
+    text-align: left;
+    transition: all 0.16s ease;
+    cursor: pointer;
+  }
+
+  :global(.quiz-opt-btn:hover) {
+    border-color: var(--sumi-ink);
+    background: var(--md-paper);
+  }
+
+  :global(.quiz-opt-btn.correct) {
+    background: var(--matcha-soft);
+    border-color: var(--matcha-green);
+    color: var(--matcha-green);
+  }
+
+  :global(.quiz-opt-btn.wrong) {
+    background: var(--hanko-red-soft);
+    border-color: var(--hanko-red);
+    color: var(--hanko-red);
+  }
+
+  .quiz-status-msg {
+    text-align: center;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--sumi-muted);
+  }
+
+  /* Flashcards Zen */
+  .flashcard-arena {
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .fc-counter {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--sumi-muted);
+  }
+
+  .flashcard-3d-wrapper {
+    width: 100%;
+    min-height: 270px;
+    background: var(--washi-card);
+    border: 2px solid var(--washi-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-elevated);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .flashcard-3d-wrapper:hover {
+    border-color: var(--sumi-light);
+  }
+
+  .fc-face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .flashcard-3d-wrapper.is-flipped .fc-front {
+    display: none;
+  }
+
+  .flashcard-3d-wrapper:not(.is-flipped) .fc-back {
+    display: none;
+  }
+
+  .fc-hint {
+    font-size: 0.75rem;
+    color: var(--sumi-light);
+  }
+
+  .fc-kana {
+    font-size: 0.9rem;
+    color: var(--sumi-muted);
+  }
+
+  .fc-jp {
+    font-family: var(--font-serif-jp);
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--sumi-ink);
+  }
+
+  .fc-speak-btn {
+    margin-top: 0.4rem;
+    background: var(--sumi-ink);
+    color: var(--washi-bg);
+    padding: 0.45rem 1rem;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .fc-tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--hanko-red);
+    letter-spacing: 0.08em;
+  }
+
+  .fc-phonetic {
+    font-size: 1.65rem;
+    color: var(--sumi-ink);
+    font-weight: 900;
+  }
+
+  .fc-meaning {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--matcha-green);
+  }
+
+  .fc-tip {
+    font-size: 0.84rem;
+    color: var(--sumi-muted);
+    max-width: 460px;
+  }
+
+  .fc-controls {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .fc-nav-btn,
+  .fc-flip-btn {
+    padding: 0.55rem 0.95rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--washi-border);
+    background: var(--washi-card);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .fc-know-btn {
+    padding: 0.55rem 1.1rem;
+    border-radius: var(--radius-sm);
+    background: var(--matcha-green);
+    color: var(--md-on-primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  @media (max-width: 640px) {
+    .quiz-options-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+

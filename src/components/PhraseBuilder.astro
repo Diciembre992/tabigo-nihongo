@@ -1,0 +1,1464 @@
+---
+import { BUILDER_WORDS, BUILDER_PATTERNS, GRAMMAR_BUILDER_LEVELS } from '../data/japaneseData';
+
+const introLevel = GRAMMAR_BUILDER_LEVELS[0];
+const advancedLevels = GRAMMAR_BUILDER_LEVELS.slice(1);
+---
+
+<section id="armador" class="grammar-section-block">
+  <!-- Cabecera con Enfoque Gramatical Progresivo -->
+  <div class="grammar-top-header">
+    <div>
+      <span class="section-tag">文 · LABORATORIO DE GRAMÁTICA Y CONSTRUCCIÓN DE ORACIONES</span>
+      <h2 class="section-title">Constructor Gramatical por Niveles</h2>
+      <p class="section-subtitle">
+        Aprende cómo piensa el japonés paso a paso: empieza en el <strong>Nivel Introductorio</strong> con combinaciones rápidas y avanza por los <strong>Niveles 1, 2 y 3</strong> dominando partículas, contadores, verbos de deseo y oraciones compuestas.
+      </p>
+    </div>
+
+    <!-- Resumen de Progreso Global del Paso 1 (Guardado en JSON) -->
+    <div class="step-mastery-summary-pill">
+      <span class="sm-label">Progreso Gramatical (Paso 1):</span>
+      <strong id="grammar-total-progress-badge">Nivel Introductorio · 0 oraciones dominadas</strong>
+    </div>
+  </div>
+
+  <!-- BARRA DE NIVELES DE APRENDIZAJE (INTRO -> NIVEL 1 -> NIVEL 2 -> NIVEL 3) -->
+  <div class="grammar-levels-bar" role="tablist" aria-label="Niveles de gramática y construcción de frases">
+    {GRAMMAR_BUILDER_LEVELS.map((lvl, idx) => (
+      <button
+        type="button"
+        class={`g-level-tab ${idx === 0 ? 'active' : ''}`}
+        data-glevel-tab={lvl.id}
+        data-glevel-target={lvl.targetMasteryCount}
+      >
+        <div class="gl-top">
+          <span class="gl-step-num">{idx === 0 ? 'Nivel 0' : `Nivel ${idx}`}</span>
+          <span class="gl-prog-pill" data-glevel-count={lvl.id}>0/{lvl.targetMasteryCount} 💮</span>
+        </div>
+        <strong class="gl-title">{lvl.shortTitle.split('·')[1]?.trim() || lvl.shortTitle}</strong>
+        <div class="gl-mini-bar">
+          <div class="gl-mini-fill" data-glevel-bar={lvl.id} style="width: 0%"></div>
+        </div>
+      </button>
+    ))}
+  </div>
+
+  <!-- BANNER EXPLICATIVO DEL NIVEL ACTIVO + CHIPS DE GRAMÁTICA + CONMUTADOR DE MODO -->
+  <div class="active-level-banner" id="grammar-level-banner">
+    <div class="alb-info">
+      <div class="alb-tags-row">
+        <span class="alb-badge" id="alb-badge">{introLevel.badge}</span>
+        <div class="alb-focus-chips" id="alb-focus-chips">
+          {introLevel.grammarFocus.map((gf) => (
+            <span class="focus-chip">🔹 {gf}</span>
+          ))}
+        </div>
+      </div>
+      <h3 class="alb-title" id="alb-title">{introLevel.title}</h3>
+      <p class="alb-subtitle" id="alb-subtitle">{introLevel.subtitle}</p>
+    </div>
+
+    <!-- Interruptor: Modo Laboratorio Constructor vs Modo Reto de Ordenar Oraciones -->
+    <div class="alb-mode-switch">
+      <button type="button" class="gmode-btn active" id="gmode-build-btn">
+        🧱 Construir Oraciones
+      </button>
+      <button type="button" class="gmode-btn challenge-mode-btn" id="gmode-scramble-btn">
+        🧩 Reto: Ordenar Bloques
+      </button>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODO A: LABORATORIO DE CONSTRUCCIÓN DE ORACIONES (POR NIVEL)
+       ======================================================================= -->
+  <div class="builder-layout" id="grammar-build-workspace">
+    <!-- Columna Izquierda: Selectores de Bloques Gramaticales según el Nivel -->
+    <div class="builder-controls">
+      <!-- PANEL NIVEL 0 (INTRODUCTORIO): 2 Piezas de Supervivencia -->
+      <div class="level-controls-pane" data-level-pane="intro">
+        <div class="control-group">
+          <label class="step-label">
+            <span class="step-num">1</span>
+            Elige la estructura gramatical básica (Final de oración):
+          </label>
+          <div class="patterns-grid" id="builder-patterns">
+            {BUILDER_PATTERNS.map((pat, idx) => (
+              <button
+                type="button"
+                class={`pattern-btn ${idx === 0 ? 'active' : ''}`}
+                data-pattern-id={pat.id}
+                data-suffix-jp={pat.suffixJp}
+                data-suffix-kana={pat.suffixKana}
+                data-suffix-romaji={pat.suffixRomaji}
+                data-suffix-phonetic={pat.suffixPhonetic}
+                data-label-es={pat.labelEs}
+                data-explanation={pat.explanation}
+                data-allowed={pat.allowedCategories.join(',')}
+              >
+                <span class="pattern-intent">{pat.intent}</span>
+                <strong class="pattern-es">{pat.labelEs}</strong>
+                <span class="pattern-romaji">[Sustantivo] + {pat.suffixRomaji}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="step-label">
+            <span class="step-num">2</span>
+            Elige el Sustantivo (Tema / Objeto / Lugar):
+          </label>
+          <div class="words-grid" id="builder-words">
+            {BUILDER_WORDS.map((word, idx) => (
+              <button
+                type="button"
+                class={`word-chip ${idx === 0 ? 'active' : ''}`}
+                data-word-id={word.id}
+                data-jp={word.jp}
+                data-kana={word.kana}
+                data-romaji={word.romaji}
+                data-phonetic={word.esPhonetic}
+                data-es={word.es}
+                data-category={word.category}
+              >
+                <span class="word-icon">{word.icon}</span>
+                <div class="word-chip-text">
+                  <span class="word-es">{word.es}</span>
+                  <span class="word-romaji">{word.romaji} ({word.jp})</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- PANELES NIVELES 1, 2 Y 3: FÓRMULAS GRAMATICALES + 3 BLOQUES SINTÁCTICOS -->
+      {advancedLevels.map((lvl) => (
+        <div class="level-controls-pane" data-level-pane={lvl.id} hidden>
+          <!-- Selector de Estructura Gramatical dentro del Nivel -->
+          <div class="control-group formula-selector-card">
+            <label class="step-label">
+              <span class="step-num">📐</span>
+              Estructura gramatical a practicar en {lvl.shortTitle}:
+            </label>
+            <div class="template-pills-row">
+              {lvl.templates.map((tpl, tIdx) => (
+                <button
+                  type="button"
+                  class={`tpl-select-btn ${tIdx === 0 ? 'active' : ''}`}
+                  data-level-id={lvl.id}
+                  data-tpl-id={tpl.id}
+                >
+                  {tpl.titleEs}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <!-- Contenedores de las Plantillas de 3 Bloques del Nivel -->
+          {lvl.templates.map((tpl, tIdx) => (
+            <div
+              class="template-slots-container"
+              data-tpl-container={tpl.id}
+              data-parent-level={lvl.id}
+              hidden={tIdx !== 0}
+            >
+              <!-- Explicación de la Fórmula Sintáctica -->
+              <div class="formula-blueprint-box">
+                <div class="fb-formula-line">
+                  <span class="fb-tag">FÓRMULA JAPONESA:</span>
+                  <code class="fb-code">{tpl.structureFormula}</code>
+                </div>
+                <p class="fb-rule">💡 <strong>Regla gramatical:</strong> {tpl.grammarRule}</p>
+              </div>
+
+              <!-- BLOQUE GRAMATICAL 1 -->
+              <div class="control-group slot-card slot-1-border">
+                <label class="step-label">
+                  <span class="step-num slot-badge-1">1</span>
+                  {tpl.slot1Label}
+                </label>
+                <div class="slot-options-grid">
+                  {tpl.slot1Options.map((opt, oIdx) => (
+                    <button
+                      type="button"
+                      class={`g-slot-btn ${oIdx === 0 ? 'active' : ''}`}
+                      data-slot-num="1"
+                      data-tpl-ref={tpl.id}
+                      data-opt-id={opt.id}
+                      data-jp={opt.jp}
+                      data-kana={opt.kana}
+                      data-romaji={opt.romaji}
+                      data-phonetic={opt.esPhonetic}
+                      data-es={opt.es}
+                      data-particle={opt.particleTag}
+                      data-role={opt.roleNote}
+                    >
+                      <div class="gs-top">
+                        <span class="gs-jp">{opt.jp}</span>
+                        <span class="gs-particle-badge p-badge-1">{opt.particleTag}</span>
+                      </div>
+                      <strong class="gs-es">{opt.es}</strong>
+                      <span class="gs-romaji">"{opt.esPhonetic}" · {opt.roleNote}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <!-- BLOQUE GRAMATICAL 2 -->
+              <div class="control-group slot-card slot-2-border">
+                <label class="step-label">
+                  <span class="step-num slot-badge-2">2</span>
+                  {tpl.slot2Label}
+                </label>
+                <div class="slot-options-grid">
+                  {tpl.slot2Options.map((opt, oIdx) => (
+                    <button
+                      type="button"
+                      class={`g-slot-btn ${oIdx === 0 ? 'active' : ''}`}
+                      data-slot-num="2"
+                      data-tpl-ref={tpl.id}
+                      data-opt-id={opt.id}
+                      data-jp={opt.jp}
+                      data-kana={opt.kana}
+                      data-romaji={opt.romaji}
+                      data-phonetic={opt.esPhonetic}
+                      data-es={opt.es}
+                      data-particle={opt.particleTag}
+                      data-role={opt.roleNote}
+                    >
+                      <div class="gs-top">
+                        <span class="gs-jp">{opt.jp}</span>
+                        <span class="gs-particle-badge p-badge-2">{opt.particleTag}</span>
+                      </div>
+                      <strong class="gs-es">{opt.es}</strong>
+                      <span class="gs-romaji">"{opt.esPhonetic}" · {opt.roleNote}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <!-- BLOQUE GRAMATICAL 3 -->
+              <div class="control-group slot-card slot-3-border">
+                <label class="step-label">
+                  <span class="step-num slot-badge-3">3</span>
+                  {tpl.slot3Label}
+                </label>
+                <div class="slot-options-grid">
+                  {tpl.slot3Options.map((opt, oIdx) => (
+                    <button
+                      type="button"
+                      class={`g-slot-btn ${oIdx === 0 ? 'active' : ''}`}
+                      data-slot-num="3"
+                      data-tpl-ref={tpl.id}
+                      data-opt-id={opt.id}
+                      data-jp={opt.jp}
+                      data-kana={opt.kana}
+                      data-romaji={opt.romaji}
+                      data-phonetic={opt.esPhonetic}
+                      data-es={opt.es}
+                      data-particle={opt.particleTag}
+                      data-role={opt.roleNote}
+                    >
+                      <div class="gs-top">
+                        <span class="gs-jp">{opt.jp}</span>
+                        <span class="gs-particle-badge p-badge-3">{opt.particleTag}</span>
+                      </div>
+                      <strong class="gs-es">{opt.es}</strong>
+                      <span class="gs-romaji">"{opt.esPhonetic}" · {opt.roleNote}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+
+    <!-- Columna Derecha: Tarjeta Material 3 de Oración Armada, Desglose Gramatical y Voz -->
+    <div class="builder-result-card">
+      <div class="result-inner">
+        <div class="result-badges">
+          <span class="badge-polite" id="res-level-tag">✨ Nivel 0 · Japonés Cortés</span>
+          <div class="result-top-actions">
+            <span class="item-mastery-badge" id="builder-sentence-status" data-status="nuevo">🌱 Nueva oración</span>
+            <button type="button" class="fullscreen-card-btn" id="toggle-big-card" title="Ampliar texto para mostrarlo en pantalla">
+              🔍 Cartel grande
+            </button>
+          </div>
+        </div>
+
+        <p class="result-es-meaning" id="res-es-meaning">¿Dónde está el baño / aseo?</p>
+
+        <!-- Caja Principal de la Oración Japonesa con Bloques Coloreados -->
+        <div class="result-jp-box">
+          <span class="result-kana" id="res-kana">といれ はどこですか？</span>
+          <h3 class="result-jp" id="res-jp">
+            <span class="highlight-word" id="res-jp-word">トイレ</span>
+            <span class="highlight-middle" id="res-jp-middle" hidden></span>
+            <span class="highlight-suffix" id="res-jp-suffix">はどこですか？</span>
+          </h3>
+        </div>
+
+        <!-- Desglose Gramatical Bloque por Bloque (Anatomy Breakdown) -->
+        <div class="grammar-anatomy-box" id="res-anatomy-box">
+          <span class="anatomy-label">🔬 Anatomía gramatical de tu oración:</span>
+          <div class="anatomy-pills" id="res-anatomy-pills">
+            <div class="anat-item anat-1">
+              <small>Tema / Objeto</small>
+              <strong>トイレ (El baño)</strong>
+            </div>
+            <div class="anat-item anat-3">
+              <small>Partícula は + Pregunta</small>
+              <strong>はどこですか？ (¿Dónde está?)</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guía Fonética Española Destacada -->
+        <div class="phonetic-guide-box">
+          <div class="phonetic-header">
+            <span class="phonetic-tag">🇪🇸 Pronunciación guiada sílaba a sílaba:</span>
+          </div>
+          <div class="phonetic-syllables" id="res-phonetic">
+            <span class="phonetic-word-part">Tói-re</span>
+            <span class="phonetic-Connector">+</span>
+            <span class="phonetic-suffix-part">ua dó-ko des-ká</span>
+          </div>
+          <p class="grammar-mini-tip" id="res-explanation">
+            💡 La partícula は (pronunciada "ua") marca de qué estás hablando, y "doko desu ka" pregunta "¿dónde está?".
+          </p>
+        </div>
+
+        <!-- Botones de Acción de Audio y Micrófono -->
+        <div class="audio-actions">
+          <button type="button" class="btn-audio primary-audio" id="builder-speak-normal">
+            <span class="btn-icon">🔊</span>
+            <div>
+              <strong>Escuchar Nativo</strong>
+              <small>Velocidad normal (1.0x)</small>
+            </div>
+          </button>
+
+          <button type="button" class="btn-audio slow-audio" id="builder-speak-slow">
+            <span class="btn-icon">🐢</span>
+            <div>
+              <strong>Cámara Lenta</strong>
+              <small>Sílabas claras (0.6x)</small>
+            </div>
+          </button>
+
+          <button type="button" class="btn-audio mic-audio" id="builder-mic-btn">
+            <span class="btn-icon">🎙️</span>
+            <div>
+              <strong>Pronunciar Ahora</strong>
+              <small>Evaluar mi voz (+20 XP)</small>
+            </div>
+          </button>
+        </div>
+
+        <div class="mic-feedback-box" id="builder-mic-feedback" hidden>
+          <div class="mic-status-text" id="builder-mic-text">Escuchando en japonés...</div>
+        </div>
+
+        <!-- Evaluación Adaptativa de esta Oración (Guarda Progreso del Nivel en el JSON) -->
+        <div class="sentence-mastery-actions">
+          <button
+            type="button"
+            class="sentence-weak-btn"
+            id="builder-mark-weak-btn"
+            title="Marcar esta estructura gramatical para reforzarla"
+          >
+            🎯 Necesito fortalecer
+          </button>
+          <button
+            type="button"
+            class="sentence-master-btn"
+            id="builder-mark-mastered-btn"
+            title="Registrar esta oración como dominada en este nivel (+15 XP)"
+          >
+            💮 ¡Domino esta oración! (+15 XP)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODO B: RETO GRAMATICAL DEL NIVEL (ORDENAR BLOQUES DE LA ORACIÓN)
+       ======================================================================= -->
+  <div class="scramble-challenge-card" id="grammar-scramble-workspace" hidden>
+    <div class="sc-header">
+      <div>
+        <span class="sc-eyebrow" id="sc-level-eyebrow">🧩 RETO GRAMATICAL · NIVEL 0</span>
+        <h3 class="sc-prompt-title" id="sc-prompt-es">¿Dónde está la estación de tren?</h3>
+        <p class="sc-grammar-hint" id="sc-hint-text">
+          💡 Pista: Primero el lugar (Estación) + partícula de tema (wa) + dónde está (doko desu ka)
+        </p>
+      </div>
+      <div class="sc-counter-pill" id="sc-progress-pill">
+        Reto 1 de 3
+      </div>
+    </div>
+
+    <!-- Zona donde se van colocando los bloques elegidos -->
+    <div class="sc-answer-tray-wrap">
+      <span class="sc-tray-label">Tu oración en japonés (haz clic en un bloque colocado para quitarlo):</span>
+      <div class="sc-answer-tray" id="sc-answer-tray">
+        <span class="sc-empty-placeholder">Toca los bloques de abajo en el orden gramatical correcto...</span>
+      </div>
+    </div>
+
+    <!-- Banco de bloques desordenados -->
+    <div class="sc-bank-wrap">
+      <span class="sc-tray-label">Bloques disponibles:</span>
+      <div class="sc-bank-grid" id="sc-bank-grid"></div>
+    </div>
+
+    <!-- Feedback del Reto Gramatical -->
+    <div class="sc-feedback-banner" id="sc-feedback-banner" hidden>
+      <p id="sc-feedback-msg"></p>
+      <div class="sc-feedback-actions">
+        <button type="button" class="sc-listen-btn" id="sc-listen-btn">🔊 Escuchar oración</button>
+        <button type="button" class="sc-next-btn" id="sc-next-btn">Siguiente oración del nivel →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Datos JSON embebidos para el motor de niveles gramaticales -->
+  <script
+    type="application/json"
+    id="grammar-levels-data"
+    set:html={JSON.stringify(GRAMMAR_BUILDER_LEVELS)}
+  />
+</section>
+
+<style>
+  .grammar-section-block {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0.25rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .grammar-top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--hanko-red);
+    background: var(--hanko-red-soft);
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+    margin-bottom: 0.45rem;
+  }
+
+  .section-title {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(1.5rem, 2.8vw, 2.05rem);
+    color: var(--sumi-ink);
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+  }
+
+  .section-subtitle {
+    color: var(--sumi-muted);
+    font-size: 0.94rem;
+    max-width: 680px;
+  }
+
+  .step-mastery-summary-pill {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    padding: 0.55rem 1rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .sm-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--md-muted);
+  }
+
+  .step-mastery-summary-pill strong {
+    font-size: 0.85rem;
+    color: var(--md-primary);
+  }
+
+  /* BARRA DE 4 NIVELES DE PROGRESO GRAMATICAL */
+  .grammar-levels-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.65rem;
+  }
+
+  .g-level-tab {
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .g-level-tab:hover {
+    border-color: var(--md-outline);
+    transform: translateY(-1px);
+  }
+
+  .g-level-tab.active {
+    background: var(--md-paper);
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 2px rgba(185, 56, 41, 0.14);
+  }
+
+  .gl-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .gl-step-num {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--md-muted);
+  }
+
+  .g-level-tab.active .gl-step-num {
+    color: var(--md-primary);
+  }
+
+  .gl-prog-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--md-surface-low);
+    color: var(--md-on-surface-variant);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .gl-title {
+    font-size: 0.9rem;
+    color: var(--md-on-surface);
+  }
+
+  .gl-mini-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--md-surface-container);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 0.15rem;
+  }
+
+  .gl-mini-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--md-secondary), var(--md-primary));
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }
+
+  /* BANNER DEL NIVEL ACTIVO */
+  .active-level-banner {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 1.15rem 1.35rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .alb-info {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .alb-tags-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .alb-badge {
+    font-size: 0.74rem;
+    font-weight: 800;
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    padding: 0.22rem 0.65rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .alb-focus-chips {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .focus-chip {
+    font-size: 0.73rem;
+    font-weight: 600;
+    background: var(--md-surface-low);
+    color: var(--md-on-surface-variant);
+    padding: 0.18rem 0.55rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--md-outline-variant);
+  }
+
+  .alb-title {
+    font-family: var(--font-serif-jp);
+    font-size: 1.18rem;
+    color: var(--md-on-surface);
+  }
+
+  .alb-subtitle {
+    font-size: 0.86rem;
+    color: var(--md-on-surface-variant);
+  }
+
+  .alb-mode-switch {
+    display: inline-flex;
+    background: var(--md-surface-container);
+    padding: 0.28rem;
+    border-radius: var(--radius-pill);
+    gap: 0.25rem;
+  }
+
+  .gmode-btn {
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--md-on-surface-variant);
+    transition: all 0.18s ease;
+  }
+
+  .gmode-btn.active {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* LAYOUT DE CONSTRUCCIÓN */
+  .builder-layout {
+    display: grid;
+    grid-template-columns: 1.18fr 0.92fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .builder-layout[hidden],
+  .level-controls-pane[hidden],
+  .template-slots-container[hidden],
+  .scramble-challenge-card[hidden] {
+    display: none !important;
+  }
+
+  .builder-controls,
+  .level-controls-pane,
+  .template-slots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .control-group {
+    background: var(--washi-card);
+    border: 1px solid var(--washi-border);
+    border-radius: var(--radius-md);
+    padding: 1.15rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .formula-selector-card {
+    background: var(--md-surface-low);
+  }
+
+  .template-pills-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .tpl-select-btn {
+    text-align: left;
+    padding: 0.65rem 0.95rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--md-outline-variant);
+    background: var(--md-surface);
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--md-on-surface);
+    transition: all 0.18s ease;
+  }
+
+  .tpl-select-btn.active {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border-color: var(--md-primary);
+  }
+
+  .formula-blueprint-box {
+    background: var(--md-grad-amber);
+    border: 1px solid #E5D0A1;
+    border-radius: var(--radius-md);
+    padding: 0.95rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .fb-formula-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .fb-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--md-tertiary);
+    letter-spacing: 0.05em;
+  }
+
+  .fb-code {
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: var(--md-on-surface);
+    background: var(--md-glass);
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .fb-rule {
+    font-size: 0.82rem;
+    color: var(--md-on-surface-variant);
+    line-height: 1.45;
+  }
+
+  /* SLOTS DE 3 BLOQUES GRAMATICALES */
+  .slot-1-border {
+    border-left: 4px solid var(--md-secondary);
+  }
+
+  .slot-2-border {
+    border-left: 4px solid var(--md-tertiary);
+  }
+
+  .slot-3-border {
+    border-left: 4px solid var(--md-primary);
+  }
+
+  .slot-badge-1 {
+    background: var(--md-secondary) !important;
+  }
+
+  .slot-badge-2 {
+    background: var(--md-tertiary) !important;
+  }
+
+  .slot-badge-3 {
+    background: var(--md-primary) !important;
+  }
+
+  .slot-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 0.55rem;
+  }
+
+  .g-slot-btn {
+    text-align: left;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--washi-border);
+    background: var(--washi-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+    transition: all 0.16s ease;
+  }
+
+  .g-slot-btn:hover {
+    border-color: var(--md-outline);
+    transform: translateY(-1px);
+  }
+
+  .g-slot-btn.active {
+    background: var(--md-paper);
+    border-color: var(--md-on-surface);
+    box-shadow: 0 0 0 2px rgba(29, 27, 24, 0.12);
+  }
+
+  .gs-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .gs-jp {
+    font-family: var(--font-serif-jp);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--md-on-surface);
+  }
+
+  .gs-particle-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .p-badge-1 {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+
+  .p-badge-2 {
+    background: var(--md-tertiary-container);
+    color: var(--md-tertiary);
+  }
+
+  .p-badge-3 {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+  }
+
+  .gs-es {
+    font-size: 0.85rem;
+    color: var(--md-on-surface);
+  }
+
+  .gs-romaji {
+    font-size: 0.72rem;
+    color: var(--md-muted);
+  }
+
+  .step-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 0.92rem;
+    margin-bottom: 0.85rem;
+    color: var(--sumi-ink);
+  }
+
+  .step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--sumi-ink);
+    color: var(--washi-bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+    gap: 0.6rem;
+  }
+
+  .pattern-btn {
+    text-align: left;
+    padding: 0.75rem 0.9rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--washi-border);
+    background: var(--washi-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    transition: all 0.2s ease;
+  }
+
+  .pattern-btn.active {
+    border-color: var(--hanko-red);
+    background: var(--md-blush);
+    box-shadow: 0 0 0 2px rgba(200, 62, 43, 0.12);
+  }
+
+  .pattern-intent {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sumi-muted);
+    font-weight: 600;
+  }
+
+  .pattern-es {
+    font-size: 0.9rem;
+    color: var(--sumi-ink);
+  }
+
+  .pattern-romaji {
+    font-size: 0.76rem;
+    color: var(--hanko-red);
+    font-weight: 600;
+  }
+
+  .words-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .word-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.7rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--washi-border);
+    background: var(--washi-bg);
+    text-align: left;
+    transition: all 0.18s ease;
+  }
+
+  .word-chip.active {
+    border-color: var(--matcha-green);
+    background: var(--matcha-soft);
+    box-shadow: 0 0 0 2px rgba(63, 98, 77, 0.15);
+  }
+
+  .word-chip.dimmed {
+    opacity: 0.42;
+  }
+
+  .word-icon {
+    font-size: 1.3rem;
+  }
+
+  .word-chip-text {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .word-es {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--sumi-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .word-romaji {
+    font-size: 0.7rem;
+    color: var(--sumi-muted);
+  }
+
+  /* TARJETA DERECHA DE RESULTADO GRAMATICAL */
+  .builder-result-card {
+    position: sticky;
+    top: 86px;
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-outline-variant);
+    box-shadow: var(--shadow-elevated);
+    border-radius: var(--radius-lg);
+  }
+
+  .result-inner {
+    padding: 1.5rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .result-badges {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .result-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .badge-polite {
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: var(--matcha-green);
+    background: var(--matcha-soft);
+    padding: 0.22rem 0.65rem;
+    border-radius: 99px;
+  }
+
+  .item-mastery-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-pill);
+    background: var(--md-surface-low);
+    color: var(--md-muted);
+    border: 1px solid var(--md-outline-variant);
+  }
+
+  .item-mastery-badge[data-status='dominado'] {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+
+  .item-mastery-badge[data-status='fortalecer'] {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+  }
+
+  .fullscreen-card-btn {
+    font-size: 0.73rem;
+    font-weight: 600;
+    color: var(--sumi-muted);
+    background: var(--washi-warm);
+    padding: 0.22rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .result-es-meaning {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--sumi-ink);
+  }
+
+  .result-jp-box {
+    background: var(--washi-bg);
+    border: 1.5px solid var(--washi-border);
+    border-radius: var(--radius-md);
+    padding: 1.2rem 1rem;
+    text-align: center;
+    transition: all 0.25s ease;
+  }
+
+  .result-jp-box.giant-mode {
+    padding: 2.2rem 1.2rem;
+    border-color: var(--hanko-red);
+    background: var(--md-paper);
+  }
+
+  .result-jp-box.giant-mode .result-jp {
+    font-size: 2.5rem;
+  }
+
+  .result-kana {
+    display: block;
+    font-size: 0.84rem;
+    color: var(--sumi-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .result-jp {
+    font-family: var(--font-serif-jp);
+    font-size: 1.75rem;
+    font-weight: 900;
+    line-height: 1.35;
+  }
+
+  .highlight-word {
+    color: var(--md-secondary);
+    border-bottom: 2px dotted var(--md-secondary);
+  }
+
+  .highlight-middle {
+    color: var(--md-tertiary);
+    border-bottom: 2px dotted var(--md-tertiary);
+    margin: 0 0.1rem;
+  }
+
+  .highlight-suffix {
+    color: var(--md-primary);
+  }
+
+  /* Desglose Anatómico de la Oración */
+  .grammar-anatomy-box {
+    background: var(--md-surface-low);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .anatomy-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--md-muted);
+  }
+
+  .anatomy-pills {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+    gap: 0.45rem;
+  }
+
+  .anat-item {
+    background: var(--md-surface);
+    border-radius: 8px;
+    padding: 0.45rem 0.6rem;
+    border-left: 3px solid var(--md-outline);
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .anat-item small {
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: var(--md-muted);
+  }
+
+  .anat-item strong {
+    font-size: 0.78rem;
+    color: var(--md-on-surface);
+  }
+
+  .anat-1 {
+    border-left-color: var(--md-secondary);
+  }
+
+  .anat-2 {
+    border-left-color: var(--md-tertiary);
+  }
+
+  .anat-3 {
+    border-left-color: var(--md-primary);
+  }
+
+  .phonetic-guide-box {
+    background: var(--md-grad-sand);
+    border: 1px solid #E6D7BE;
+    border-left: 4px solid var(--kintsugi-gold);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem;
+  }
+
+  .phonetic-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--kintsugi-gold);
+    text-transform: uppercase;
+  }
+
+  .phonetic-syllables {
+    margin: 0.4rem 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .phonetic-word-part {
+    color: var(--md-secondary);
+    background: var(--md-secondary-container);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+  }
+
+  .phonetic-middle-part {
+    color: var(--md-tertiary);
+    background: var(--md-tertiary-container);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+  }
+
+  .phonetic-Connector {
+    color: var(--sumi-light);
+    font-weight: 400;
+  }
+
+  .phonetic-suffix-part {
+    color: var(--md-primary);
+    background: var(--md-primary-container);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+  }
+
+  .grammar-mini-tip {
+    font-size: 0.8rem;
+    color: var(--sumi-muted);
+    margin-top: 0.3rem;
+  }
+
+  .audio-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .btn-audio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.2rem;
+    padding: 0.65rem 0.4rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--washi-border);
+    background: var(--washi-bg);
+  }
+
+  .btn-audio strong {
+    font-size: 0.76rem;
+    color: var(--sumi-ink);
+  }
+
+  .btn-audio small {
+    font-size: 0.65rem;
+    color: var(--sumi-muted);
+  }
+
+  .primary-audio {
+    background: var(--sumi-ink);
+    border-color: var(--sumi-ink);
+  }
+
+  .primary-audio strong {
+    color: var(--washi-bg);
+  }
+
+  .primary-audio small {
+    color: var(--md-faint);
+  }
+
+  .sentence-mastery-actions {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 0.55rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid var(--md-outline-variant);
+  }
+
+  .sentence-weak-btn {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border: 1px solid rgba(185, 56, 41, 0.3);
+    padding: 0.65rem 0.8rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .sentence-master-btn {
+    background: var(--md-secondary);
+    color: var(--md-on-primary);
+    padding: 0.65rem 0.9rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  /* MODO B: RETO DE ORDENAR BLOQUES GRAMATICALES */
+  .scramble-challenge-card {
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-elevated);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .sc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--md-outline-variant);
+  }
+
+  .sc-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--md-primary);
+    letter-spacing: 0.06em;
+  }
+
+  .sc-prompt-title {
+    font-family: var(--font-serif-jp);
+    font-size: 1.45rem;
+    color: var(--md-on-surface);
+    margin: 0.2rem 0;
+  }
+
+  .sc-grammar-hint {
+    font-size: 0.85rem;
+    color: var(--md-on-surface-variant);
+  }
+
+  .sc-counter-pill {
+    background: var(--md-surface-low);
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .sc-tray-label {
+    display: block;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--md-muted);
+    margin-bottom: 0.45rem;
+  }
+
+  .sc-answer-tray {
+    min-height: 74px;
+    background: var(--md-bg);
+    border: 2px dashed var(--md-outline);
+    border-radius: var(--radius-md);
+    padding: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .sc-empty-placeholder {
+    color: var(--md-muted);
+    font-size: 0.86rem;
+  }
+
+  .sc-bank-grid {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  :global(.sc-block-chip) {
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-on-surface);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 1rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.15s ease;
+  }
+
+  :global(.sc-block-chip:hover) {
+    transform: translateY(-2px);
+    background: var(--md-primary-container);
+  }
+
+  :global(.sc-block-chip .sc-b-jp) {
+    font-family: var(--font-serif-jp);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--md-on-surface);
+  }
+
+  :global(.sc-block-chip .sc-b-sub) {
+    font-size: 0.7rem;
+    color: var(--md-muted);
+  }
+
+  .sc-feedback-banner {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .sc-feedback-actions {
+    display: flex;
+    gap: 0.55rem;
+  }
+
+  .sc-listen-btn,
+  .sc-next-btn {
+    padding: 0.55rem 1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+  }
+
+  @media (max-width: 960px) {
+    .grammar-levels-bar {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .builder-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .builder-result-card {
+      position: static;
+      order: -1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .grammar-levels-bar {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .slot-options-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .sentence-mastery-actions {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

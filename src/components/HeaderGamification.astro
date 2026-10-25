@@ -1,0 +1,1218 @@
+---
+---
+
+<header class="m3-top-bar">
+  <div class="bar-inner">
+    <div class="left-group">
+      <button
+        type="button"
+        class="hamburger-btn"
+        id="hamburger-btn"
+        aria-label="Abrir menú"
+        aria-controls="nav-drawer"
+        aria-expanded="false"
+      >
+        <span class="hb-line"></span>
+        <span class="hb-line"></span>
+        <span class="hb-line"></span>
+      </button>
+
+      <button type="button" class="brand-btn" id="nav-home-logo" title="Ir al inicio">
+        <span class="hanko-stamp">旅</span>
+        <span class="brand-name">TabiGo</span>
+      </button>
+
+      <button type="button" class="back-home-chip" id="back-to-hub-btn" hidden>
+        <span>←</span>
+        <span>Inicio</span>
+      </button>
+    </div>
+
+    <div class="right-group">
+      <div class="m3-chip streak-chip" title="Días de racha">
+        <span>🔥</span>
+        <strong id="streak-count">1</strong>
+      </div>
+
+      <div class="m3-chip xp-chip" title="Experiencia acumulada">
+        <span class="rank-dot"></span>
+        <span id="traveler-rank" class="rank-label-desktop">Turista Curioso</span>
+        <strong class="xp-val"><span id="xp-count">0</span> XP</strong>
+      </div>
+
+      <button
+        type="button"
+        class="theme-toggle-btn"
+        id="theme-toggle-btn"
+        aria-label="Cambiar entre modo claro y oscuro"
+        aria-pressed="false"
+        title="Modo claro / oscuro"
+      >
+        <span id="theme-toggle-icon" aria-hidden="true">🌙</span>
+      </button>
+
+      <button class="m3-tonal-btn" id="open-passport-btn" type="button">
+        <span>📕</span>
+        <span class="tonal-label">Progreso</span>
+        <span class="stamp-pill-count" id="stamp-counter">0/24</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MENÚ HAMBURGUESA · Navegación lateral con pasos desplegables -->
+<div class="drawer-scrim" id="nav-drawer-scrim" hidden></div>
+<aside class="nav-drawer" id="nav-drawer" aria-hidden="true" aria-label="Menú principal">
+  <div class="drawer-head">
+    <span class="drawer-brand"><span class="hanko-stamp">旅</span> TabiGo</span>
+    <button type="button" class="icon-close-btn" id="drawer-close-btn" aria-label="Cerrar menú">✕</button>
+  </div>
+
+  <nav class="drawer-nav">
+    <button type="button" class="drawer-link" id="drawer-home-btn">
+      <span class="dl-ico">🏠</span> Inicio
+    </button>
+
+    <details class="drawer-step" name="drawer-steps" open>
+      <summary><span class="dl-num">1</span> Hablar y vocabulario <span class="dl-chev"></span></summary>
+      <div class="drawer-sub">
+        <button type="button" class="drawer-item" data-switch-activity="builder">Constructor de frases</button>
+        <button type="button" class="drawer-item" data-switch-activity="visual-words">Palabras ilustradas</button>
+        <button type="button" class="drawer-item" data-switch-activity="vocab">Expresiones y melodía</button>
+      </div>
+    </details>
+
+    <details class="drawer-step" name="drawer-steps">
+      <summary><span class="dl-num green">2</span> Leer y escribir <span class="dl-chev"></span></summary>
+      <div class="drawer-sub">
+        <button type="button" class="drawer-item" data-switch-activity="kana-table">Tabla Hiragana · Katakana</button>
+        <button type="button" class="drawer-item" data-switch-activity="dojo">Caligrafía y carteles</button>
+      </div>
+    </details>
+
+    <details class="drawer-step" name="drawer-steps">
+      <summary><span class="dl-num amber">3</span> Practicar en viaje <span class="dl-chev"></span></summary>
+      <div class="drawer-sub">
+        <button type="button" class="drawer-item" data-switch-activity="simulator">Simulador de viaje</button>
+        <button type="button" class="drawer-item" data-switch-activity="minigame">Reto y flashcards</button>
+      </div>
+    </details>
+
+    <div class="drawer-divider"></div>
+
+    <button type="button" class="drawer-link" id="drawer-progress-btn">
+      <span class="dl-ico">📕</span> Mi progreso y sellos
+    </button>
+    <button type="button" class="drawer-link" id="hub-download-json-btn">
+      <span class="dl-ico">⬇️</span> Descargar progreso (.json)
+    </button>
+    <button type="button" class="drawer-link" id="hub-upload-json-btn">
+      <span class="dl-ico">⬆️</span> Subir progreso (.json)
+    </button>
+    <button type="button" class="drawer-link" id="drawer-theme-btn">
+      <span class="dl-ico">🌓</span> Cambiar modo claro / oscuro
+    </button>
+  </nav>
+</aside>
+
+<!-- Diálogo Material 3: Centro de Progreso, Diagnóstico de Dominio y Gestión JSON -->
+<div class="modal-backdrop" id="passport-modal" aria-hidden="true">
+  <div class="m3-dialog">
+    <div class="dialog-header">
+      <div>
+        <span class="dialog-eyebrow">御朱印帳 · MEMORIA INTELIGENTE Y ARCHIVO JSON</span>
+        <h2>Tu Progreso, Dominio y Sellos</h2>
+      </div>
+      <button class="icon-close-btn" id="close-passport-btn" type="button" aria-label="Cerrar">✕</button>
+    </div>
+
+    <!-- Panel de Almacenamiento JSON (Carpeta storage/ + Descargar + Subir) -->
+    <div class="json-storage-panel">
+      <div class="json-status-row">
+        <div class="storage-indicator">
+          <span class="pulse-dot"></span>
+          <span>Sincronizado con <code>storage/user-progress.json</code></span>
+        </div>
+        <span class="last-sync-text" id="json-last-saved">Guardado automático activo</span>
+      </div>
+
+      <div class="json-actions-row">
+        <button type="button" class="json-btn download-btn" id="download-json-btn">
+          ⬇️ Descargar progreso (.json)
+        </button>
+
+        <button type="button" class="json-btn upload-btn" id="upload-json-btn">
+          ⬆️ Subir fichero .json
+        </button>
+        <input
+          type="file"
+          id="upload-json-input"
+          accept=".json,application/json"
+          hidden
+        />
+      </div>
+    </div>
+
+    <!-- Diagnóstico de Dominio vs. Necesita Fortalecer -->
+    <div class="mastery-diagnostic-card">
+      <div class="diag-counters">
+        <div class="diag-box mastered-box">
+          <span class="diag-num" id="modal-mastered-count">0</span>
+          <span class="diag-label">💮 Dominadas</span>
+        </div>
+        <div class="diag-box learning-box">
+          <span class="diag-num" id="modal-learning-count">0</span>
+          <span class="diag-label">📈 En estudio</span>
+        </div>
+        <div class="diag-box weak-box">
+          <span class="diag-num" id="modal-weak-count">0</span>
+          <span class="diag-label">🎯 Por fortalecer</span>
+        </div>
+      </div>
+
+      <div class="weak-items-container" id="weak-items-container">
+        <span class="weak-title">Elementos detectados para fortalecer:</span>
+        <div class="weak-chips-list" id="weak-chips-list">
+          <span class="empty-weak-msg">Aún no hay fallos registrados. ¡Sigue practicando!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de nivel, escalera de 12 rangos y misiones -->
+    <div class="progress-summary-card">
+      <div class="prog-top">
+        <span class="prog-title" id="modal-rank-title">🌱 Nv. 1 · Turista Curioso</span>
+        <span class="prog-Hint" id="modal-xp-detail">0 / 100 XP</span>
+      </div>
+      <div class="xp-progress-track">
+        <div class="xp-progress-fill" id="xp-bar" style="width: 8%"></div>
+      </div>
+
+      <details class="ranks-roadmap">
+        <summary>Ver los 12 niveles de rango (hasta 5.000+ XP)</summary>
+        <div class="ranks-list" id="ranks-roadmap-list">
+          <div class="rank-tier" data-rank-min="0"><span>🌱 Nv. 1 · Turista Curioso</span><small>0 XP</small></div>
+          <div class="rank-tier" data-rank-min="100"><span>🍙 Nv. 2 · Explorador de Konbini</span><small>100 XP</small></div>
+          <div class="rank-tier" data-rank-min="250"><span>⛩️ Nv. 3 · Caminante de Kioto</span><small>250 XP</small></div>
+          <div class="rank-tier" data-rank-min="450"><span>🍜 Nv. 4 · Habitual del Izakaya</span><small>450 XP</small></div>
+          <div class="rank-tier" data-rank-min="700"><span>🏮 Nv. 5 · Viajero de Asakusa</span><small>700 XP</small></div>
+          <div class="rank-tier" data-rank-min="1000"><span>🚅 Nv. 6 · Viajero del Shinkansen</span><small>1.000 XP</small></div>
+          <div class="rank-tier" data-rank-min="1400"><span>🌸 Nv. 7 · Conocedor del Hanami</span><small>1.400 XP</small></div>
+          <div class="rank-tier" data-rank-min="1900"><span>♨️ Nv. 8 · Huésped del Ryokan</span><small>1.900 XP</small></div>
+          <div class="rank-tier" data-rank-min="2500"><span>🖌️ Nv. 9 · Discípulo del Shodō</span><small>2.500 XP</small></div>
+          <div class="rank-tier" data-rank-min="3200"><span>🗾 Nv. 10 · Guía de Japón</span><small>3.200 XP</small></div>
+          <div class="rank-tier" data-rank-min="4000"><span>🗻 Nv. 11 · Sabio del Fuji</span><small>4.000 XP</small></div>
+          <div class="rank-tier" data-rank-min="5000"><span>🏯 Nv. 12 · Leyenda de Nihon</span><small>5.000+ XP</small></div>
+        </div>
+      </details>
+
+      <div class="mini-quests-row">
+        <div class="quest-item" id="quest-voice" data-completed="false">
+          <span>🗣️ Voz (<span id="quest-voice-prog">0</span>/5) · +40 XP</span>
+        </div>
+        <div class="quest-item" id="quest-kanji" data-completed="false">
+          <span>🖌️ Trazos (<span id="quest-kanji-prog">0</span>/3) · +50 XP</span>
+        </div>
+        <div class="quest-item" id="quest-sim" data-completed="false">
+          <span>⛩️ Viaje (<span id="quest-sim-prog">0</span>/2) · +70 XP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stamps-header-row">
+      <p class="dialog-sub">
+        Sellos <em>Goshuin</em> (<strong id="modal-stamp-ratio">0/24</strong>):
+      </p>
+      <div class="stamp-filter-bar" role="tablist" aria-label="Filtrar sellos por categoría">
+        <button type="button" class="stamp-filter-chip active" data-stamp-filter="all">Todos (24)</button>
+        <button type="button" class="stamp-filter-chip" data-stamp-filter="paso1">Paso 1 · Hablar (13)</button>
+        <button type="button" class="stamp-filter-chip" data-stamp-filter="paso2">Paso 2 · Escritura (5)</button>
+        <button type="button" class="stamp-filter-chip" data-stamp-filter="paso3">Paso 3 · Viaje (6)</button>
+      </div>
+    </div>
+
+    <div class="stamps-grid" id="stamps-grid">
+      <!-- Voz y pronunciación -->
+      <div class="stamp-slot" data-stamp-id="first-voice" data-stamp-cat="paso1">
+        <div class="stamp-circle">声</div>
+        <h4>Primera Voz</h4>
+        <p>Escucha o pronuncia 1 frase</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="mic-speaker" data-stamp-cat="paso1">
+        <div class="stamp-circle">話</div>
+        <h4>Voz de Viajero</h4>
+        <p>Usa el micrófono o 5 voces</p>
+      </div>
+
+      <!-- Paso 1A: Gramática por niveles -->
+      <div class="stamp-slot" data-stamp-id="grammar-intro" data-stamp-cat="paso1">
+        <div class="stamp-circle">礎</div>
+        <h4>Base Gramatical</h4>
+        <p>4 oraciones en Intro</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="grammar-n1" data-stamp-cat="paso1">
+        <div class="stamp-circle">文</div>
+        <h4>Arquitecto Nv. 1</h4>
+        <p>5 oraciones en Nivel 1</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="grammar-n2" data-stamp-cat="paso1">
+        <div class="stamp-circle">橋</div>
+        <h4>Conector Nv. 2</h4>
+        <p>5 oraciones en Nivel 2</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="grammar-n3" data-stamp-cat="paso1">
+        <div class="stamp-circle">極</div>
+        <h4>Sintaxis Nv. 3</h4>
+        <p>5 oraciones en Nivel 3</p>
+      </div>
+
+      <!-- Paso 1B: 80 Palabras Ilustradas por niveles -->
+      <div class="stamp-slot" data-stamp-id="vwords-intro" data-stamp-cat="paso1">
+        <div class="stamp-circle">絵</div>
+        <h4>Visual Intro</h4>
+        <p>10 palabras ilustradas Nv. 0</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="vwords-n1" data-stamp-cat="paso1">
+        <div class="stamp-circle">買</div>
+        <h4>Visual Nivel 1</h4>
+        <p>10 palabras ilustradas Nv. 1</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="vwords-n2" data-stamp-cat="paso1">
+        <div class="stamp-circle">街</div>
+        <h4>Visual Nivel 2</h4>
+        <p>10 palabras ilustradas Nv. 2</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="vwords-n3" data-stamp-cat="paso1">
+        <div class="stamp-circle">博</div>
+        <h4>Visual Nivel 3</h4>
+        <p>10 palabras ilustradas Nv. 3</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="vwords-master" data-stamp-cat="paso1">
+        <div class="stamp-circle">百</div>
+        <h4>Coleccionista</h4>
+        <p>50 palabras ilustradas en total</p>
+      </div>
+
+      <!-- Paso 1C: 28 Expresiones y Melodía -->
+      <div class="stamp-slot" data-stamp-id="vocab-starter" data-stamp-cat="paso1">
+        <div class="stamp-circle">唄</div>
+        <h4>Oído Melódico</h4>
+        <p>7 expresiones dominadas</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="vocab-master" data-stamp-cat="paso1">
+        <div class="stamp-circle">響</div>
+        <h4>Maestro Expresivo</h4>
+        <p>20 expresiones dominadas</p>
+      </div>
+
+      <!-- Paso 2A: Tabla Kana y Reto del Oído -->
+      <div class="stamp-slot" data-stamp-id="kana-ear-5" data-stamp-cat="paso2">
+        <div class="stamp-circle">耳</div>
+        <h4>Oído Kana</h4>
+        <p>5 kana en reto sin pistas</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="kana-ear-15" data-stamp-cat="paso2">
+        <div class="stamp-circle">聴</div>
+        <h4>Radar Fonético</h4>
+        <p>15 kana dominados al oído</p>
+      </div>
+
+      <!-- Paso 2B: Caligrafía y Carteles -->
+      <div class="stamp-slot" data-stamp-id="calligrapher" data-stamp-cat="paso2">
+        <div class="stamp-circle">書</div>
+        <h4>Pincel Zen</h4>
+        <p>Traza 3 signos en el lienzo</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="kanji-street" data-stamp-cat="paso2">
+        <div class="stamp-circle">道</div>
+        <h4>Carteles de Calle</h4>
+        <p>Traza 8 signos en el Dojo</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="shodo-master" data-stamp-cat="paso2">
+        <div class="stamp-circle">墨</div>
+        <h4>Maestro Shodō</h4>
+        <p>Completa los 16 signos</p>
+      </div>
+
+      <!-- Paso 3A: 4 Escenarios del Simulador de Viaje -->
+      <div class="stamp-slot" data-stamp-id="konbini" data-stamp-cat="paso3">
+        <div class="stamp-circle">便</div>
+        <h4>Konbini</h4>
+        <p>Simulación 7-Eleven (Intro)</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="ramen-izakaya" data-stamp-cat="paso3">
+        <div class="stamp-circle">麺</div>
+        <h4>Ramen Izakaya</h4>
+        <p>Restaurante (Nivel 1)</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="shinkansen-station" data-stamp-cat="paso3">
+        <div class="stamp-circle">駅</div>
+        <h4>Shinkansen</h4>
+        <p>Estación de Tokio (Nivel 2)</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="ryokan-checkin" data-stamp-cat="paso3">
+        <div class="stamp-circle">宿</div>
+        <h4>Ryokan Kioto</h4>
+        <p>Posada tradicional (Nivel 3)</p>
+      </div>
+
+      <!-- Paso 3B: Reto Expreso Yamanote -->
+      <div class="stamp-slot" data-stamp-id="yamanote-ace" data-stamp-cat="paso3">
+        <div class="stamp-circle">速</div>
+        <h4>Expreso Yamanote</h4>
+        <p>Combo x5 en el reto</p>
+      </div>
+      <div class="stamp-slot" data-stamp-id="yamanote-legend" data-stamp-cat="paso3">
+        <div class="stamp-circle">雷</div>
+        <h4>Relámpago Tokio</h4>
+        <p>Combo x10 o 25 aciertos</p>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button class="text-reset-btn" id="reset-progress-btn" type="button">Reiniciar progreso a cero</button>
+    </div>
+  </div>
+</div>
+
+<!-- Snackbar Material 3 para avisos sutiles -->
+<div id="xp-toast-container" class="m3-snackbar-container" aria-live="polite"></div>
+
+<style>
+  /* ===== Hamburguesa y menú lateral ===== */
+  .hamburger-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background 0.18s ease;
+  }
+
+  .hamburger-btn:hover {
+    background: var(--md-surface-container);
+  }
+
+  .hb-line {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--md-on-surface);
+  }
+
+  .drawer-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 190;
+    animation: fadeSlideUp 0.2s ease;
+  }
+
+  .drawer-scrim[hidden] {
+    display: none;
+  }
+
+  .nav-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(320px, 86vw);
+    z-index: 200;
+    background: var(--md-surface);
+    border-right: 1px solid var(--md-outline-variant);
+    box-shadow: var(--shadow-elevated);
+    transform: translateX(-105%);
+    transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .nav-drawer.open {
+    transform: translateX(0);
+  }
+
+  .drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1rem 0.75rem 1.15rem;
+  }
+
+  .drawer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-serif-jp);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--md-on-surface);
+  }
+
+  .drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.25rem 0.6rem 1.25rem;
+  }
+
+  .drawer-link,
+  .drawer-step > summary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 0.8rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--md-on-surface);
+    text-align: left;
+    cursor: pointer;
+    list-style: none;
+    transition: background 0.16s ease;
+  }
+
+  .drawer-step > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .drawer-link:hover,
+  .drawer-step > summary:hover {
+    background: var(--md-surface-low);
+  }
+
+  .dl-ico {
+    width: 22px;
+    text-align: center;
+  }
+
+  .dl-num {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+  }
+
+  .dl-num.green {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+
+  .dl-num.amber {
+    background: var(--md-tertiary-container);
+    color: var(--md-tertiary);
+  }
+
+  .dl-chev {
+    margin-left: auto;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--md-muted);
+    border-bottom: 2px solid var(--md-muted);
+    transform: rotate(45deg);
+    transition: transform 0.22s ease;
+  }
+
+  .drawer-step[open] > summary .dl-chev {
+    transform: rotate(-135deg);
+  }
+
+  .drawer-sub {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.15rem 0 0.4rem 1.6rem;
+  }
+
+  .drawer-item {
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.88rem;
+    color: var(--md-on-surface-variant);
+    text-align: left;
+    transition: background 0.16s ease;
+  }
+
+  .drawer-item:hover {
+    background: var(--md-surface-low);
+  }
+
+  .drawer-item.active {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    font-weight: 700;
+  }
+
+  .drawer-divider {
+    height: 1px;
+    background: var(--md-outline-variant);
+    margin: 0.6rem 0.4rem;
+  }
+
+  .m3-top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--md-header-glass);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--md-outline-variant);
+  }
+
+  .bar-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    height: 64px;
+    padding: 0 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .left-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .brand-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--md-on-surface);
+    padding: 0.25rem 0.4rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.2s ease;
+  }
+
+  .brand-btn:hover {
+    background: var(--md-surface-low);
+  }
+
+  .brand-name {
+    font-family: var(--font-serif-jp);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .back-home-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--md-surface-container);
+    color: var(--md-on-surface);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-pill);
+    transition: background 0.18s ease;
+  }
+
+  .back-home-chip[hidden] {
+    display: none;
+  }
+
+  .back-home-chip:hover {
+    background: var(--md-surface-high);
+  }
+
+  .right-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .m3-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 36px;
+    padding: 0 0.8rem;
+    border-radius: var(--radius-pill);
+    background: var(--md-surface-low);
+    border: 1px solid var(--md-outline-variant);
+    font-size: 0.82rem;
+    color: var(--md-on-surface);
+  }
+
+  .rank-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-secondary);
+  }
+
+  .rank-label-desktop {
+    color: var(--md-on-surface-variant);
+    font-weight: 500;
+  }
+
+  .xp-val {
+    color: var(--md-secondary);
+    font-weight: 700;
+  }
+
+  .m3-tonal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    height: 36px;
+    padding: 0 0.9rem;
+    border-radius: var(--radius-pill);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: filter 0.18s ease;
+  }
+
+  .m3-tonal-btn:hover {
+    filter: brightness(0.96);
+  }
+
+  .stamp-pill-count {
+    background: rgba(185, 56, 41, 0.14);
+    color: var(--md-primary);
+    padding: 0.05rem 0.45rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.74rem;
+    font-weight: 700;
+  }
+
+  /* Material 3 Dialog */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(29, 27, 24, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+  }
+
+  .modal-backdrop[aria-hidden="false"] {
+    display: flex;
+  }
+
+  .m3-dialog {
+    background: var(--md-bg);
+    border-radius: var(--radius-lg);
+    max-width: 640px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-elevated);
+    border: 1px solid var(--md-outline-variant);
+  }
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .dialog-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--md-primary);
+  }
+
+  .dialog-header h2 {
+    font-family: var(--font-serif-jp);
+    font-size: 1.4rem;
+  }
+
+  .icon-close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--md-surface-container);
+    color: var(--md-on-surface);
+    font-size: 1rem;
+  }
+
+  /* Panel de Almacenamiento JSON */
+  .json-storage-panel {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.15rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .json-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+  }
+
+  .storage-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+    color: var(--md-secondary);
+  }
+
+  .storage-indicator code {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    padding: 0.1rem 0.45rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+  }
+
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-secondary);
+  }
+
+  .last-sync-text {
+    color: var(--md-muted);
+    font-size: 0.74rem;
+  }
+
+  .json-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .json-btn {
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-align: center;
+    transition: all 0.18s ease;
+  }
+
+  .download-btn {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+  }
+
+  .download-btn:hover {
+    background: var(--md-primary);
+  }
+
+  .upload-btn {
+    background: var(--md-surface-low);
+    color: var(--md-on-surface);
+    border: 1px solid var(--md-outline);
+  }
+
+  .upload-btn:hover {
+    background: var(--md-surface-container);
+  }
+
+  /* Diagnóstico de Dominio */
+  .mastery-diagnostic-card {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.15rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .diag-counters {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  .diag-box {
+    border-radius: var(--radius-sm);
+    padding: 0.65rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .mastered-box {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+
+  .learning-box {
+    background: var(--md-tertiary-container);
+    color: var(--md-on-surface);
+  }
+
+  .weak-box {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+  }
+
+  .diag-num {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .diag-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .weak-items-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .weak-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--md-muted);
+  }
+
+  .weak-chips-list {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  :global(.weak-item-pill) {
+    font-size: 0.76rem;
+    font-weight: 700;
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .empty-weak-msg {
+    font-size: 0.78rem;
+    color: var(--md-muted);
+  }
+
+  .progress-summary-card {
+    background: var(--md-surface);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--md-outline-variant);
+    margin-bottom: 1.15rem;
+  }
+
+  .prog-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .prog-title {
+    font-weight: 700;
+  }
+
+  .prog-Hint {
+    color: var(--md-muted);
+  }
+
+  .xp-progress-track {
+    height: 8px;
+    background: var(--md-surface-container);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    margin-bottom: 0.85rem;
+  }
+
+  .xp-progress-fill {
+    height: 100%;
+    background: var(--md-secondary);
+    border-radius: var(--radius-pill);
+    transition: width 0.4s ease;
+  }
+
+  .ranks-roadmap {
+    margin-bottom: 0.75rem;
+    border-top: 1px solid var(--md-outline-variant);
+    padding-top: 0.55rem;
+  }
+
+  .ranks-roadmap summary {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--md-primary);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .ranks-list {
+    margin-top: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.35rem;
+  }
+
+  .rank-tier {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0.55rem;
+    border-radius: var(--radius-sm);
+    background: var(--md-surface-low);
+    border: 1px solid var(--md-outline-variant);
+    font-size: 0.75rem;
+    color: var(--md-muted);
+  }
+
+  .rank-tier.reached {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    border-color: transparent;
+    font-weight: 600;
+  }
+
+  .rank-tier.current {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border-color: var(--md-primary);
+    font-weight: 700;
+  }
+
+  .mini-quests-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.76rem;
+    color: var(--md-on-surface-variant);
+  }
+
+  .quest-item {
+    background: var(--md-surface-low);
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .quest-item[data-completed="true"] {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    font-weight: 600;
+  }
+
+  .stamps-header-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .dialog-sub {
+    font-size: 0.86rem;
+    color: var(--md-on-surface-variant);
+    margin: 0;
+  }
+
+  .stamp-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .stamp-filter-chip {
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--md-outline-variant);
+    background: var(--md-surface-low);
+    color: var(--md-on-surface-variant);
+    font-size: 0.76rem;
+    font-weight: 600;
+    transition: all 0.16s ease;
+  }
+
+  .stamp-filter-chip.active {
+    background: var(--md-primary);
+    color: var(--md-on-primary);
+    border-color: var(--md-primary);
+  }
+
+  .stamps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+  }
+
+  .stamp-slot[hidden] {
+    display: none;
+  }
+
+  .stamp-slot {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 0.65rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .stamp-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.5px dashed var(--md-outline);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif-jp);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--md-outline);
+    margin-bottom: 0.15rem;
+  }
+
+  .stamp-slot.unlocked {
+    border-color: rgba(185, 56, 41, 0.35);
+    background: var(--md-paper);
+  }
+
+  .stamp-slot.unlocked .stamp-circle {
+    border: 2px solid var(--md-primary);
+    color: var(--md-primary);
+    background: var(--md-primary-container);
+    transform: rotate(-6deg);
+  }
+
+  .stamp-slot h4 {
+    font-size: 0.84rem;
+  }
+
+  .stamp-slot p {
+    font-size: 0.72rem;
+    color: var(--md-muted);
+  }
+
+  .dialog-footer {
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .text-reset-btn {
+    font-size: 0.76rem;
+    color: var(--md-muted);
+    text-decoration: underline;
+  }
+
+  .m3-snackbar-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+
+  :global(.xp-toast) {
+    background: #2C2926;
+    color: #FBF9F5;
+    padding: 0.75rem 1.15rem;
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-elevated);
+    font-size: 0.84rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  @media (max-width: 640px) {
+    .bar-inner {
+      height: auto;
+      min-height: 56px;
+      padding: 0.45rem 0.85rem;
+      gap: 0.4rem;
+    }
+
+    .brand-name {
+      font-size: 1.05rem;
+    }
+
+    .back-home-chip {
+      padding: 0.3rem 0.65rem;
+      font-size: 0.76rem;
+    }
+
+    .m3-chip {
+      height: 32px;
+      padding: 0 0.55rem;
+      font-size: 0.76rem;
+    }
+
+    .m3-tonal-btn {
+      height: 32px;
+      padding: 0 0.65rem;
+      font-size: 0.76rem;
+    }
+
+    .theme-toggle-btn {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      font-size: 0.92rem;
+    }
+
+    .right-group {
+      gap: 0.3rem;
+    }
+
+    .rank-label-desktop,
+    .tonal-label {
+      display: none;
+    }
+
+    .ranks-list,
+    .json-actions-row {
+      grid-template-columns: 1fr;
+    }
+
+    .stamps-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .m3-snackbar-container {
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+    }
+  }
+</style>

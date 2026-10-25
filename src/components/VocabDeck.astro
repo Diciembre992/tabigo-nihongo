@@ -1,0 +1,973 @@
+---
+import { VOCAB_ITEMS } from '../data/japaneseData';
+
+const categories = [
+  { id: 'all', label: '⛩️ Todas del nivel' },
+  { id: 'cortesia', label: '🙇 Cortesía' },
+  { id: 'restaurante', label: '🍜 Restaurante' },
+  { id: 'transporte', label: '🚅 Trenes' },
+  { id: 'compras', label: '🏪 Compras' },
+  { id: 'emergencia', label: '🆘 Ayuda' },
+];
+---
+
+<section id="vocabulario" class="vocab-flashcard-section">
+  <!-- Barra Superior de Estudio y Opciones de Visibilidad -->
+  <div class="study-top-bar">
+    <div>
+      <div class="section-tag">音 · FLASHCARDS DE EXPRESIONES Y MELODÍA</div>
+      <h2 class="section-title">Vocabulario y Expresiones de Viaje (1 a 1)</h2>
+    </div>
+
+    <div class="study-visibility-toggles" role="group" aria-label="Opciones de visualización">
+      <button
+        type="button"
+        class="vis-chip"
+        id="vocab-toggle-blind"
+        aria-pressed="false"
+        title="Ocultar traducción y pronunciación para estudiar sin ver"
+      >
+        <span>🙈</span>
+        <span>Estudiar sin ver</span>
+      </button>
+
+      <button
+        type="button"
+        class="vis-chip active"
+        id="vocab-toggle-scripts"
+        aria-pressed="true"
+        title="Mostrar u ocultar formas de escritura y curva tonal"
+      >
+        <span>🔤</span>
+        <span>Escrituras y Tono</span>
+      </button>
+
+      <button
+        type="button"
+        class="vis-chip active"
+        id="vocab-toggle-mnemonic"
+        aria-pressed="true"
+        title="Mostrar u ocultar el truco de mnemotecnia"
+      >
+        <span>🧠</span>
+        <span>Mnemotecnia</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- BARRA DE NIVELES DE APRENDIZAJE DE EXPRESIONES Y MELODÍA (INTRO -> NIVEL 1 -> NIVEL 2 -> NIVEL 3) -->
+  <div class="vocab-levels-bar" role="tablist" aria-label="Niveles de expresiones y melodía">
+    <button type="button" class="vc-level-tab active" data-vocab-level-tab="intro">
+      <div class="vcl-top">
+        <span class="vcl-num">Nivel 0 · Intro</span>
+        <span class="vcl-count" data-vocab-lvl-count="intro">0/7 💮</span>
+      </div>
+      <strong class="vcl-title">Saludos y Supervivencia</strong>
+      <div class="vcl-bar"><div class="vcl-fill" data-vocab-lvl-bar="intro" style="width: 0%"></div></div>
+    </button>
+
+    <button type="button" class="vc-level-tab" data-vocab-level-tab="nivel-1">
+      <div class="vcl-top">
+        <span class="vcl-num">Nivel 1 · Básico</span>
+        <span class="vcl-count" data-vocab-lvl-count="nivel-1">0/7 💮</span>
+      </div>
+      <strong class="vcl-title">En la Mesa y Tiendas</strong>
+      <div class="vcl-bar"><div class="vcl-fill" data-vocab-lvl-bar="nivel-1" style="width: 0%"></div></div>
+    </button>
+
+    <button type="button" class="vc-level-tab" data-vocab-level-tab="nivel-2">
+      <div class="vcl-top">
+        <span class="vcl-num">Nivel 2 · Intermedio</span>
+        <span class="vcl-count" data-vocab-lvl-count="nivel-2">0/7 💮</span>
+      </div>
+      <strong class="vcl-title">Trenes, Tax-Free y Fotos</strong>
+      <div class="vcl-bar"><div class="vcl-fill" data-vocab-lvl-bar="nivel-2" style="width: 0%"></div></div>
+    </button>
+
+    <button type="button" class="vc-level-tab" data-vocab-level-tab="nivel-3">
+      <div class="vcl-top">
+        <span class="vcl-num">Nivel 3 · Avanzado</span>
+        <span class="vcl-count" data-vocab-lvl-count="nivel-3">0/7 💮</span>
+      </div>
+      <strong class="vcl-title">Reservas, Ayuda y Fluidez</strong>
+      <div class="vcl-bar"><div class="vcl-fill" data-vocab-lvl-bar="nivel-3" style="width: 0%"></div></div>
+    </button>
+
+    <button type="button" class="vc-level-tab" data-vocab-level-tab="all">
+      <div class="vcl-top">
+        <span class="vcl-num">Colección Completa</span>
+        <span class="vcl-count" data-vocab-lvl-count="all">0/28 💮</span>
+      </div>
+      <strong class="vcl-title">Ver las 28 Expresiones</strong>
+      <div class="vcl-bar"><div class="vcl-fill" data-vocab-lvl-bar="all" style="width: 0%"></div></div>
+    </button>
+  </div>
+
+  <!-- Filtros de Categoría + Contador -->
+  <div class="category-progress-bar">
+    <div class="category-tabs" role="tablist">
+      {categories.map((cat, index) => (
+        <button
+          type="button"
+          class={`cat-tab ${index === 0 ? 'active' : ''}`}
+          data-category-filter={cat.id}
+        >
+          <span>{cat.label}</span>
+        </button>
+      ))}
+      <button type="button" class="cat-tab weak-tab" data-category-filter="fortalecer">
+        <span>🎯 Por fortalecer (<span id="vocab-weak-filter-count">0</span>)</span>
+      </button>
+      <button type="button" class="cat-tab mastered-tab" data-category-filter="dominado">
+        <span>💮 Dominadas (<span id="vocab-mastered-filter-count">0</span>)</span>
+      </button>
+    </div>
+
+    <div class="deck-counter-pill" id="vocab-counter-pill">
+      Expresión <strong>1</strong> de <strong>7</strong>
+    </div>
+  </div>
+
+  <!-- ESCENARIO PRINCIPAL DE TARJETA ÚNICA (1 A LA VEZ) -->
+  <div class="vocab-single-stage" id="vocab-single-stage">
+    {VOCAB_ITEMS.map((item, idx) => (
+      <article
+        class={`vocab-card vocab-full-card ${idx === 0 ? 'is-current' : ''}`}
+        data-vocab-index={idx}
+        data-vocab-level={item.level}
+        data-category={item.category}
+        data-vocab-id={item.id}
+        data-vocab-label={`${item.japanese} (${item.meaning})`}
+      >
+        <div class="card-top">
+          <div class="card-top-left">
+            <span class="vc-level-pill">
+              {item.level === 'intro' ? 'Nivel 0 · Intro' : item.level.replace('nivel-', 'Nivel ')}
+            </span>
+            <span class="cat-badge">{item.category.toUpperCase()} · {item.usageContext}</span>
+            <span class="item-mastery-badge" data-status="nuevo">🌱 Nueva</span>
+          </div>
+          <button
+            type="button"
+            class="master-btn"
+            data-master-id={item.id}
+            title="Marcar frase como dominada (+10 XP)"
+          >
+            <span class="master-seal">済</span>
+            <span class="master-text">Dominada</span>
+          </button>
+        </div>
+
+        <!-- Frase Principal Japonesa -->
+        <div class="jp-hero-center">
+          <h3 class="jp-phrase">{item.japanese}</h3>
+
+          <!-- Zona Ocultable (Significado y Pronunciación en Español) -->
+          <div class="vocab-reveal-zone">
+            <div class="vocab-answer-content">
+              <p class="es-meaning">{item.meaning}</p>
+              <div class="es-phonetic-pill">
+                🇪🇸 Pronúncialo así: <strong>"{item.esPhonetic}"</strong>
+              </div>
+            </div>
+
+            <button type="button" class="vocab-reveal-btn">
+              👁️ Tocar para revelar significado y pronunciación
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones de Audio y Práctica con Micrófono -->
+        <div class="card-actions">
+          <button
+            type="button"
+            class="card-btn speak-btn"
+            data-speak-text={item.japanese}
+            data-speak-rate="0.95"
+          >
+            🔊 Escuchar Nativo
+          </button>
+          <button
+            type="button"
+            class="card-btn slow-btn"
+            data-speak-text={item.japanese}
+            data-speak-rate="0.58"
+          >
+            🐢 Cámara Lenta
+          </button>
+          <button
+            type="button"
+            class="card-btn practice-voice-btn"
+            data-target-jp={item.japanese}
+            data-target-kana={item.kana}
+            data-target-romaji={item.romaji}
+          >
+            🎙️ Evaluar mi Voz
+          </button>
+        </div>
+
+        <div class="card-voice-result" hidden></div>
+
+        <!-- PANEL CONMUTABLE 1: Las Formas de Escritura + Curva de Entonación -->
+        <div class="vocab-scripts-panel">
+          <div class="v-scripts-grid">
+            <div class="v-script-box">
+              <span class="vs-label">Estándar / Kanji</span>
+              <strong class="vs-val jp-serif">{item.japanese}</strong>
+            </div>
+            <div class="v-script-box">
+              <span class="vs-label">Hiragana (ひらがな)</span>
+              <strong class="vs-val jp-serif">{item.kana}</strong>
+            </div>
+            <div class="v-script-box">
+              <span class="vs-label">Katakana (カタカナ)</span>
+              <strong class="vs-val jp-sans">{item.katakana}</strong>
+            </div>
+            <div class="v-script-box">
+              <span class="vs-label">Romaji</span>
+              <strong class="vs-val">{item.romaji}</strong>
+            </div>
+          </div>
+
+          <!-- Visualizador de Acento Tonal (Pitch Accent) -->
+          <div class="pitch-box" title="Curva de entonación japonesa: arriba = tono agudo, abajo = tono grave">
+            <span class="pitch-label">Melodía tonal (▲ Alto / ▼ Bajo):</span>
+            <div class="pitch-track">
+              {item.pitchPattern.map((p) => (
+                <div class={`mora-node ${p.high ? 'is-high' : 'is-low'}`}>
+                  <span class="mora-dot"></span>
+                  <span class="mora-char">{p.mora}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL CONMUTABLE 2: Mnemotecnia para Memorizar -->
+        <div class="vocab-mnemonic-panel">
+          <div class="mnemo-badge">🧠</div>
+          <div class="mnemo-body">
+            <span class="mnemo-tag">MNEMOTECNIA PARA MEMORIZAR</span>
+            <p class="mnemo-text">{item.mnemonic}</p>
+            <p class="cultural-tip">🏮 <strong>Nota cultural:</strong> {item.culturalTip}</p>
+          </div>
+        </div>
+      </article>
+    ))}
+
+    <!-- Controles de Navegación Inferior y Evaluación Adaptativa (Estilo Flashcard) -->
+    <div class="deck-navigation-bar">
+      <button type="button" class="deck-nav-btn" id="vocab-prev-btn">
+        ← Anterior
+      </button>
+
+      <button type="button" class="deck-action-weak" id="vocab-need-practice-btn" title="Marcar expresión para reforzar">
+        🎯 Necesito fortalecer
+      </button>
+
+      <button type="button" class="deck-action-memorized" id="vocab-memorized-next-btn" title="Guardar como dominada en tu JSON (+15 XP)">
+        💮 ¡La domino! (+15 XP)
+      </button>
+
+      <button type="button" class="deck-nav-btn" id="vocab-next-btn">
+        Siguiente →
+      </button>
+    </div>
+
+    <!-- Tira de puntos para salto directo -->
+    <div class="quick-dots-strip" id="vocab-dots-strip">
+      {VOCAB_ITEMS.map((item, idx) => (
+        <button
+          type="button"
+          class={`dot-jump ${idx === 0 ? 'active' : ''}`}
+          data-jump-vocab={idx}
+          title={item.romaji}
+        >
+          {idx + 1}
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .vocab-flashcard-section {
+    padding: 0.25rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  .study-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--md-primary);
+    background: var(--md-primary-container);
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-pill);
+    margin-bottom: 0.35rem;
+  }
+
+  .section-title {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+  }
+
+  .study-visibility-toggles {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .vis-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--md-outline);
+    background: var(--md-surface);
+    color: var(--md-on-surface-variant);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.18s ease;
+  }
+
+  .vis-chip.active {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border-color: rgba(185, 56, 41, 0.35);
+  }
+
+  .category-progress-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Barra de 4 Niveles en Expresiones y Melodía */
+  .vocab-levels-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.55rem;
+  }
+
+  .vc-level-tab {
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 0.85rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    transition: all 0.18s ease;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .vc-level-tab:hover {
+    border-color: var(--md-outline);
+    transform: translateY(-1px);
+  }
+
+  .vc-level-tab.active {
+    background: var(--md-paper);
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 2px rgba(185, 56, 41, 0.15);
+  }
+
+  .vcl-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .vcl-num {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--md-muted);
+  }
+
+  .vc-level-tab.active .vcl-num {
+    color: var(--md-primary);
+  }
+
+  .vcl-count {
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: var(--md-surface-low);
+    padding: 0.12rem 0.45rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .vcl-title {
+    font-size: 0.84rem;
+    color: var(--md-on-surface);
+  }
+
+  .vcl-bar {
+    width: 100%;
+    height: 5px;
+    background: var(--md-surface-container);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .vcl-fill {
+    height: 100%;
+    background: var(--md-primary);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }
+
+  .vc-level-pill {
+    font-size: 0.72rem;
+    font-weight: 800;
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    padding: 0.24rem 0.65rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .cat-tab {
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--md-outline-variant);
+    background: var(--md-surface);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--md-on-surface-variant);
+  }
+
+  .cat-tab.active {
+    background: var(--md-on-surface);
+    border-color: var(--md-on-surface);
+    color: var(--md-surface);
+  }
+
+  .deck-counter-pill {
+    font-size: 0.82rem;
+    color: var(--md-on-surface-variant);
+    background: var(--md-surface-low);
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+  }
+
+  /* Escenario de Tarjeta Única */
+  .vocab-single-stage {
+    max-width: 820px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  .vocab-full-card {
+    display: none;
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    flex-direction: column;
+    gap: 1.35rem;
+    box-shadow: var(--shadow-elevated);
+    animation: fadeSlideUp 0.25s ease forwards;
+  }
+
+  .vocab-full-card.is-current {
+    display: flex;
+  }
+
+  .vocab-full-card.mastered {
+    border-color: rgba(185, 56, 41, 0.45);
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--md-outline-variant);
+  }
+
+  .cat-badge {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--md-on-surface-variant);
+    background: var(--md-surface-low);
+    padding: 0.25rem 0.7rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .master-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--md-muted);
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-pill);
+    border: 1px dashed var(--md-outline);
+  }
+
+  .vocab-full-card.mastered .master-btn {
+    border-style: solid;
+    border-color: var(--md-primary);
+    color: var(--md-primary);
+    background: var(--md-primary-container);
+  }
+
+  .jp-hero-center {
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .jp-phrase {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    font-weight: 700;
+    color: var(--md-on-surface);
+    line-height: 1.2;
+  }
+
+  .vocab-reveal-zone {
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .vocab-answer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .es-meaning {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--md-secondary);
+  }
+
+  .es-phonetic-pill {
+    background: var(--md-tertiary-container);
+    color: var(--md-on-surface);
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.96rem;
+  }
+
+  .vocab-reveal-btn {
+    display: none;
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border-radius: var(--radius-md);
+    border: 1.5px dashed var(--md-primary);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .vocab-single-stage.blind-study-active .vocab-full-card:not(.answer-revealed) .vocab-answer-content {
+    display: none;
+  }
+
+  .vocab-single-stage.blind-study-active .vocab-full-card:not(.answer-revealed) .vocab-reveal-btn {
+    display: block;
+  }
+
+  .card-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+  }
+
+  .card-btn {
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.84rem;
+    font-weight: 700;
+    border: 1px solid var(--md-outline);
+    background: var(--md-surface-low);
+    color: var(--md-on-surface);
+    transition: all 0.16s ease;
+  }
+
+  .speak-btn {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    border-color: var(--md-on-surface);
+  }
+
+  .speak-btn:hover {
+    background: var(--md-primary);
+    border-color: var(--md-primary);
+  }
+
+  .slow-btn:hover {
+    background: var(--md-tertiary-container);
+  }
+
+  .practice-voice-btn:hover {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border-color: var(--md-primary);
+  }
+
+  .card-voice-result {
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--md-surface-low);
+    text-align: center;
+  }
+
+  /* Panel de Escrituras y Tono */
+  .vocab-scripts-panel {
+    background: var(--md-bg);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .vocab-single-stage.hide-scripts-panel .vocab-scripts-panel {
+    display: none;
+  }
+
+  .v-scripts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .v-script-box {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .vs-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--md-muted);
+  }
+
+  .vs-val {
+    font-size: 1rem;
+    color: var(--md-on-surface);
+  }
+
+  .jp-serif {
+    font-family: var(--font-serif-jp);
+  }
+
+  .jp-sans {
+    font-family: var(--font-sans-jp);
+  }
+
+  .pitch-box {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .pitch-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--md-muted);
+  }
+
+  .pitch-track {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    overflow-x: auto;
+    padding: 0.25rem 0;
+  }
+
+  .mora-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 24px;
+  }
+
+  .mora-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-bottom: 4px;
+  }
+
+  .mora-node.is-high .mora-dot {
+    background: var(--md-primary);
+    transform: translateY(-4px);
+  }
+
+  .mora-node.is-low .mora-dot {
+    background: var(--md-muted);
+    transform: translateY(4px);
+  }
+
+  .mora-char {
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  /* Panel de Mnemotecnia */
+  .vocab-mnemonic-panel {
+    background: var(--md-grad-amber);
+    border: 1px solid #E5D0A1;
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  .vocab-single-stage.hide-mnemonic-panel .vocab-mnemonic-panel {
+    display: none;
+  }
+
+  .mnemo-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(143, 100, 20, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .mnemo-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .mnemo-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--md-tertiary);
+  }
+
+  .mnemo-text {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--md-on-surface);
+  }
+
+  .cultural-tip {
+    font-size: 0.8rem;
+    color: var(--md-on-surface-variant);
+    margin-top: 0.15rem;
+  }
+
+  .card-top-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .item-mastery-badge {
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 0.22rem 0.65rem;
+    border-radius: var(--radius-pill);
+    background: var(--md-surface-low);
+    color: var(--md-muted);
+    border: 1px solid var(--md-outline-variant);
+  }
+
+  .item-mastery-badge[data-status='dominado'] {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    border-color: rgba(59, 100, 76, 0.35);
+  }
+
+  .item-mastery-badge[data-status='fortalecer'] {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border-color: rgba(185, 56, 41, 0.35);
+  }
+
+  .item-mastery-badge[data-status='aprendiendo'] {
+    background: var(--md-tertiary-container);
+    color: var(--md-tertiary);
+    border-color: rgba(143, 100, 20, 0.35);
+  }
+
+  .cat-tab.weak-tab {
+    border-color: rgba(185, 56, 41, 0.35);
+    color: var(--md-primary);
+  }
+
+  .cat-tab.mastered-tab {
+    border-color: rgba(59, 100, 76, 0.35);
+    color: var(--md-secondary);
+  }
+
+  .cat-tab.active {
+    background: var(--md-on-surface);
+    border-color: var(--md-on-surface);
+    color: var(--md-surface);
+  }
+
+  /* Navegación Inferior */
+  .deck-navigation-bar {
+    display: grid;
+    grid-template-columns: 0.9fr 1.25fr 1.35fr 0.9fr;
+    gap: 0.65rem;
+  }
+
+  .deck-nav-btn {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline);
+    color: var(--md-on-surface);
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+
+  .deck-action-weak {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border: 1px solid rgba(185, 56, 41, 0.35);
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.86rem;
+    font-weight: 700;
+    transition: all 0.16s ease;
+  }
+
+  .deck-action-weak:hover {
+    background: var(--md-primary);
+    color: var(--md-on-primary);
+  }
+
+  .deck-action-memorized {
+    background: var(--md-secondary);
+    color: var(--md-on-primary);
+    padding: 0.8rem 1.1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+
+  .quick-dots-strip {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 0.35rem;
+  }
+
+  .dot-jump {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    background: var(--md-surface-low);
+    color: var(--md-on-surface-variant);
+    border: 1.5px solid var(--md-outline-variant);
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+
+  .dot-jump:hover {
+    border-color: var(--md-primary);
+    color: var(--md-on-surface);
+    transform: translateY(-1px);
+  }
+
+  .dot-jump.active {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    border-color: var(--md-on-surface);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 720px) {
+    .vocab-full-card {
+      padding: 1.35rem;
+    }
+
+    .card-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .v-scripts-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .deck-navigation-bar {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .deck-action-memorized {
+      grid-column: span 2;
+      order: -1;
+    }
+  }
+</style>

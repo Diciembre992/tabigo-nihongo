@@ -1,0 +1,215 @@
+{
+  "version": 2,
+  "updatedAt": "2026-10-25T22:40:58.357Z",
+  "xp": 607,
+  "streak": 1,
+  "lastDate": "2026-10-25",
+  "stamps": [
+    "first-voice",
+    "yamanote-ace",
+    "grammar-intro",
+    "kana-ear-5"
+  ],
+  "masteredVocab": [
+    "grammar:intro:ch-intro-1",
+    "grammar:intro:ch-intro-2",
+    "grammar:intro:ch-intro-3",
+    "kana-ku",
+    "kana-ki",
+    "konnichiwa",
+    "grammar:intro:doko-toire"
+  ],
+  "practicedChars": [
+    "hira-su"
+  ],
+  "quests": {
+    "voice": 4,
+    "kanji": 2,
+    "sim": 0,
+    "voiceClaimed": true,
+    "kanjiClaimed": true,
+    "simClaimed": false
+  },
+  "itemStats": {
+    "grammar:nivel-3:ch-n3-1": {
+      "id": "grammar:nivel-3:ch-n3-1",
+      "type": "vocab",
+      "label": "[3 · Nivel 3 (Avanzado)] 日本語がわかりませんから、ゆっくり話してください",
+      "hits": 0,
+      "misses": 1,
+      "level": "fortalecer",
+      "lastReviewed": "2026-10-25T14:28:04.308Z"
+    },
+    "grammar:intro:ch-intro-1": {
+      "id": "grammar:intro:ch-intro-1",
+      "type": "vocab",
+      "label": "[0 · Introductorio] 駅はどこですか？",
+      "hits": 6,
+      "misses": 0,
+      "level": "dominado",
+      "lastReviewed": "2026-10-25T15:19:59.263Z"
+    },
+    "grammar:intro:ch-intro-2": {
+      "id": "grammar:intro:ch-intro-2",
+      "type": "vocab",
+      "label": "[0 · Introductorio] ラーメンをください",
+      "hits": 6,
+      "misses": 0,
+      "level": "dominado",
+      "lastReviewed": "2026-10-25T15:20:08.212Z"
+    },
+    "grammar:intro:ch-intro-3": {
+      "id": "grammar:intro:ch-intro-3",
+      "type": "vocab",
+      "label": "[0 · Introductorio] これはいくらですか？",
+      "hits": 4,
+      "misses": 0,
+      "level": "dominado",
+      "lastReviewed": "2026-10-25T14:58:51.069Z"
+    },
+    "kana-o": {
+      "id": "kana-o",
+      "type": "kana",
+      "label": "Kana お/オ (o)",
+      "hits": 1,
+      "misses": 1,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T15:10:38.820Z"
+    },
+    "kana-u": {
+      "id": "kana-u",
+      "type": "kana",
+      "label": "Kana う/ウ (u)",
+      "hits": 1,
+      "misses": 0,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T15:10:46.727Z"
+    },
+    "kana-ku": {
+      "id": "kana-ku",
+      "type": "kana",
+      "label": "Kana く/ク (ku)",
+      "hits": 2,
+      "misses": 0,
+      "level": "dominado",
+      "lastReviewed": "2026-10-25T15:11:22.445Z"
+    },
+    "kana-ki": {
+      "id": "kana-ki",
+      "type": "kana",
+      "label": "Kana き/キ (ki)",
+      "hits": 2,
+      "misses": 0,
+      "level": "dominado",
+      "lastReviewed": "2026-10-25T15:11:42.101Z"
+    },
+    "kana-shi": {
+      "id": "kana-shi",
+      "type": "kana",
+      "label": "Kana し/シ (shi)",
+      "hits": 1,
+      "misses": 0,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T15:11:15.832Z"
+    },
+    "kana-sa": {
+      "id": "kana-sa",
+      "type": "kana",
+      "label": "Kana さ/サ (sa)",
+      "hits": 1,
+      "misses": 0,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T15:11:32.393Z"
+    },
+    "kana-su": {
+      "id": "kana-su",
+      "type": "kana",
+      "label": "Kana す/ス (su)",
+      "hits": 2,
+      "misses": 2,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T22:13:25.302Z"
+    },
+    "konnichiwa": {
+      "id": "konnichiwa",
+      "type": "vocab",
+      "label": "こんにちは (Hola / Buenas tardes (10:00 a 18:00))",
+      "hits": 2,
+      "misses": 0,
+      "level": "dominado",
+      "lastReviewed": "2026-10-25T15:15:23.672Z"
+    },
+    "omizu": {
+      "id": "omizu",
+      "type": "vocab",
+      "label": "お水をください (Agua, por favor)",
+      "hits": 1,
+      "misses": 0,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T15:15:47.734Z"
+    },
+    "osusume": {
+      "id": "osusume",
+      "type": "vocab",
+      "label": "おすすめは何ですか？ (¿Cuál es la recomendación de la casa?)",
+      "hits": 1,
+      "misses": 0,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T15:16:09.637Z"
+    },
+    "itadakimasu": {
+      "id": "itadakimasu",
+      "type": "vocab",
+      "label": "いただきます (¡Buen provecho! (Antes de empezar a comer))",
+      "hits": 1,
+      "misses": 0,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T15:16:33.464Z"
+    },
+    "ikura-desuka": {
+      "id": "ikura-desuka",
+      "type": "vocab",
+      "label": "これはいくらですか？ (¿Cuánto cuesta esto?)",
+      "hits": 1,
+      "misses": 0,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T15:16:58.646Z"
+    },
+    "kana-ha": {
+      "id": "kana-ha",
+      "type": "kana",
+      "label": "Kana は/ハ (ha)",
+      "hits": 1,
+      "misses": 2,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T22:15:05.782Z"
+    },
+    "kana-wa": {
+      "id": "kana-wa",
+      "type": "kana",
+      "label": "Kana わ/ワ (wa)",
+      "hits": 1,
+      "misses": 15,
+      "level": "aprendiendo",
+      "lastReviewed": "2026-10-25T22:16:56.580Z"
+    },
+    "kana-mi": {
+      "id": "kana-mi",
+      "type": "kana",
+      "label": "Kana み/ミ (mi)",
+      "hits": 0,
+      "misses": 12,
+      "level": "fortalecer",
+      "lastReviewed": "2026-10-25T22:17:52.428Z"
+    },
+    "grammar:intro:doko-toire": {
+      "id": "grammar:intro:doko-toire",
+      "type": "vocab",
+      "label": "トイレはどこですか？ (¿Dónde está el baño / aseo?)",
+      "hits": 2,
+      "misses": 0,
+      "level": "dominado",
+      "lastReviewed": "2026-10-25T22:30:26.119Z"
+    }
+  }
+}

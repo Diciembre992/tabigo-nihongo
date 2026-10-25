@@ -1,0 +1,1023 @@
+---
+import { VISUAL_COMMON_WORDS } from '../data/japaneseData';
+---
+
+<section id="palabras-visuales" class="visual-flashcard-section">
+  <!-- Cabecera Compacta y Controles de Estudio -->
+  <div class="study-top-bar">
+    <div class="title-area">
+      <span class="section-tag">図鑑 · ESTUDIO ENFOCADO 1 A 1</span>
+      <h2 class="section-title">Vocabulario Común Ilustrado</h2>
+    </div>
+
+    <!-- Interruptores de Visibilidad (Estudiar sin ver / Escrituras / Mnemotecnia) -->
+    <div class="study-visibility-toggles" role="group" aria-label="Opciones de visualización de estudio">
+      <button
+        type="button"
+        class="vis-chip"
+        id="vword-toggle-blind"
+        aria-pressed="false"
+        title="Oculta el significado y la pronunciación para ponerte a prueba antes de mirar"
+      >
+        <span>🙈</span>
+        <span>Estudiar sin ver</span>
+      </button>
+
+      <button
+        type="button"
+        class="vis-chip active"
+        id="vword-toggle-scripts"
+        aria-pressed="true"
+        title="Mostrar u ocultar las 4 formas de escritura (Kanji, Hiragana, Katakana, Romaji)"
+      >
+        <span>🔤</span>
+        <span>Formas de escritura</span>
+      </button>
+
+      <button
+        type="button"
+        class="vis-chip active"
+        id="vword-toggle-mnemonic"
+        aria-pressed="true"
+        title="Mostrar u ocultar el truco mnemotécnico de memorización"
+      >
+        <span>🧠</span>
+        <span>Mnemotecnia</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- BARRA DE NIVELES DE APRENDIZAJE DE PALABRAS COMUNES ILUSTRADAS (INTRO -> NIVEL 1 -> NIVEL 2 -> NIVEL 3) -->
+  <div class="vword-levels-bar" role="tablist" aria-label="Niveles de vocabulario ilustrado">
+    <button type="button" class="vw-level-tab active" data-vword-level-tab="intro">
+      <div class="vwl-top">
+        <span class="vwl-num">Nivel 0 · Intro</span>
+        <span class="vwl-count" data-vword-lvl-count="intro">0/20 💮</span>
+      </div>
+      <strong class="vwl-title">Supervivencia Día 1 (20)</strong>
+      <div class="vwl-bar"><div class="vwl-fill" data-vword-lvl-bar="intro" style="width: 0%"></div></div>
+    </button>
+
+    <button type="button" class="vw-level-tab" data-vword-level-tab="nivel-1">
+      <div class="vwl-top">
+        <span class="vwl-num">Nivel 1 · Básico</span>
+        <span class="vwl-count" data-vword-lvl-count="nivel-1">0/20 💮</span>
+      </div>
+      <strong class="vwl-title">Mesas, Café y Billetes (20)</strong>
+      <div class="vwl-bar"><div class="vwl-fill" data-vword-lvl-bar="nivel-1" style="width: 0%"></div></div>
+    </button>
+
+    <button type="button" class="vw-level-tab" data-vword-level-tab="nivel-2">
+      <div class="vwl-top">
+        <span class="vwl-num">Nivel 2 · Intermedio</span>
+        <span class="vwl-count" data-vword-lvl-count="nivel-2">0/20 💮</span>
+      </div>
+      <strong class="vwl-title">Templos, Metro y Menú (20)</strong>
+      <div class="vwl-bar"><div class="vwl-fill" data-vword-lvl-bar="nivel-2" style="width: 0%"></div></div>
+    </button>
+
+    <button type="button" class="vw-level-tab" data-vword-level-tab="nivel-3">
+      <div class="vwl-top">
+        <span class="vwl-num">Nivel 3 · Avanzado</span>
+        <span class="vwl-count" data-vword-lvl-count="nivel-3">0/20 💮</span>
+      </div>
+      <strong class="vwl-title">Onsen, Ryokan y Ayuda (20)</strong>
+      <div class="vwl-bar"><div class="vwl-fill" data-vword-lvl-bar="nivel-3" style="width: 0%"></div></div>
+    </button>
+
+    <button type="button" class="vw-level-tab" data-vword-level-tab="all">
+      <div class="vwl-top">
+        <span class="vwl-num">Colección Completa</span>
+        <span class="vwl-count" data-vword-lvl-count="all">0/80 💮</span>
+      </div>
+      <strong class="vwl-title">Ver las 80 Palabras</strong>
+      <div class="vwl-bar"><div class="vwl-fill" data-vword-lvl-bar="all" style="width: 0%"></div></div>
+    </button>
+  </div>
+
+  <!-- Filtros de Categoría + Contador de Progreso -->
+  <div class="category-progress-bar">
+    <div class="v-cat-pills" role="tablist">
+      <button type="button" class="v-cat-btn active" data-vcat="all">Todas del nivel</button>
+      <button type="button" class="v-cat-btn" data-vcat="comida">🍜 Comida</button>
+      <button type="button" class="v-cat-btn" data-vcat="transporte">🚅 Transporte</button>
+      <button type="button" class="v-cat-btn" data-vcat="lugares">⛩️ Lugares</button>
+      <button type="button" class="v-cat-btn" data-vcat="objetos">💴 Objetos</button>
+      <button type="button" class="v-cat-btn weak-filter-btn" data-vcat="fortalecer">
+        🎯 Por fortalecer (<span id="vword-weak-filter-count">0</span>)
+      </button>
+      <button type="button" class="v-cat-btn mastered-filter-btn" data-vcat="dominado">
+        💮 Dominadas (<span id="vword-mastered-filter-count">0</span>)
+      </button>
+    </div>
+
+    <div class="deck-counter-pill" id="vword-counter-pill">
+      Palabra <strong>1</strong> de <strong>20</strong>
+    </div>
+  </div>
+
+  <!-- ESCENARIO DE FLASHCARD A PANTALLA COMPLETA (1 SOLA TARJETA ACTIVA A LA VEZ) -->
+  <div class="single-card-stage">
+    {VISUAL_COMMON_WORDS.map((word, idx) => (
+      <article
+        class={`full-study-card ${idx === 0 ? 'is-current' : ''}`}
+        data-vword-index={idx}
+        data-vword-level={word.level}
+        data-vword-cat={word.category}
+        data-vword-id={word.id}
+        data-vword-label={`${word.kanji} (${word.es})`}
+      >
+        <!-- Barra superior interna de la Flashcard -->
+        <div class="fcard-header">
+          <div class="fcard-meta-left">
+            <span class="level-tag-pill">
+              {word.level === 'intro' ? 'Nivel 0 · Intro' : word.level.replace('nivel-', 'Nivel ')}
+            </span>
+            <span class="usual-pill">
+              Escritura habitual en Japón: <strong>{word.usualForm}</strong>
+            </span>
+            <span class="item-mastery-badge" data-status="nuevo">🌱 Nueva</span>
+          </div>
+
+          <div class="fcard-audio-group">
+            <button
+              type="button"
+              class="v-audio-btn primary"
+              data-speak-word={word.hiragana.split(' ')[0]}
+              data-speak-rate="0.95"
+            >
+              🔊 Escuchar
+            </button>
+            <button
+              type="button"
+              class="v-audio-btn slow"
+              data-speak-word={word.hiragana.split(' ')[0]}
+              data-speak-rate="0.55"
+              title="Escuchar sílaba por sílaba"
+            >
+              🐢 Lento
+            </button>
+          </div>
+        </div>
+
+        <!-- Zona Central: Ilustración + Palabra Japonesa Principal + Significado (Ocultable) -->
+        <div class="fcard-hero-grid">
+          <div class="fcard-illustration">
+            {word.svgType === 'water' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="40" r="34" fill="#E0F2FE" />
+                <path d="M60 14C60 14 38 38 38 51C38 63 48 70 60 70C72 70 82 63 82 51C82 38 60 14 60 14Z" fill="#0284C7" />
+                <path d="M49 49C49 55 53 60 60 60" stroke="#BAE6FD" stroke-width="3.5" stroke-linecap="round" />
+              </svg>
+            )}
+            {word.svgType === 'ramen' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#FCEAE6" />
+                <path d="M28 42H92C90 61 77 70 60 70C43 70 30 61 28 42Z" fill="#B93829" />
+                <path d="M36 42C42 32 54 32 60 42C66 32 78 32 84 42" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round" />
+                <line x1="40" y1="20" x2="88" y2="14" stroke="#5E5A52" stroke-width="3" stroke-linecap="round" />
+                <line x1="40" y1="27" x2="88" y2="23" stroke="#5E5A52" stroke-width="3" stroke-linecap="round" />
+              </svg>
+            )}
+            {word.svgType === 'tea' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#E1EFE6" />
+                <rect x="38" y="34" width="44" height="34" rx="9" fill="#3B644C" />
+                <path d="M52 24Q56 18 52 12M68 24Q72 18 68 12" stroke="#3B644C" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="38" y1="45" x2="82" y2="45" stroke="#A7F3D0" stroke-width="2.5" />
+              </svg>
+            )}
+            {word.svgType === 'beer' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#FEF3C7" />
+                <rect x="38" y="28" width="34" height="40" rx="5" fill="#F59E0B" />
+                <path d="M72 34H82V56H72" stroke="#D97706" stroke-width="4" stroke-linecap="round" />
+                <path d="M36 28C36 22 44 20 48 24C52 18 62 18 66 24C70 22 74 24 74 28H36Z" fill="#FFFFFF" />
+              </svg>
+            )}
+            {word.svgType === 'rice' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#F3EDE2" />
+                <path d="M36 44C36 26 84 26 84 44H36Z" fill="#FFFFFF" stroke="#D8D0C2" stroke-width="2" />
+                <path d="M32 44H88C84 62 74 68 60 68C46 68 36 62 32 44Z" fill="#1D1B18" />
+              </svg>
+            )}
+            {word.svgType === 'train' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#E0E7FF" />
+                <path d="M24 54C28 34 46 28 92 28V54H24Z" fill="#FFFFFF" stroke="#2563EB" stroke-width="2.5" />
+                <line x1="26" y1="46" x2="92" y2="46" stroke="#2563EB" stroke-width="3" />
+                <rect x="52" y="34" width="12" height="7" rx="2" fill="#1E40AF" />
+                <rect x="70" y="34" width="12" height="7" rx="2" fill="#1E40AF" />
+              </svg>
+            )}
+            {word.svgType === 'station' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#E1EFE6" />
+                <rect x="28" y="24" width="64" height="36" rx="4" fill="#1D1B18" />
+                <rect x="34" y="30" width="52" height="24" rx="2" fill="#FFFFFF" />
+                <line x1="34" y1="42" x2="86" y2="42" stroke="#16A34A" stroke-width="4" />
+              </svg>
+            )}
+            {word.svgType === 'ticket' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#F9ECCF" />
+                <rect x="30" y="26" width="60" height="32" rx="4" fill="#FFFBEB" stroke="#B48327" stroke-width="2.5" />
+                <line x1="72" y1="26" x2="72" y2="58" stroke="#B48327" stroke-width="2" stroke-dasharray="3 3" />
+                <circle cx="48" cy="42" r="6" fill="#B93829" />
+              </svg>
+            )}
+            {word.svgType === 'airport' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#E0F2FE" />
+                <path d="M32 48L86 28L76 56L58 46L44 56L46 44L32 48Z" fill="#0284C7" />
+              </svg>
+            )}
+            {word.svgType === 'hotel' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#F3EDE2" />
+                <rect x="40" y="20" width="40" height="48" rx="3" fill="#5E5A52" />
+                <rect x="47" y="27" width="8" height="8" fill="#FEF3C7" />
+                <rect x="65" y="27" width="8" height="8" fill="#FEF3C7" />
+                <rect x="47" y="40" width="8" height="8" fill="#FEF3C7" />
+                <rect x="65" y="40" width="8" height="8" fill="#FEF3C7" />
+                <rect x="54" y="54" width="12" height="14" fill="#B93829" />
+              </svg>
+            )}
+            {word.svgType === 'toilet' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#FCEAE6" />
+                <circle cx="46" cy="26" r="6" fill="#2563EB" />
+                <path d="M38 36H54L52 58H40L38 36Z" fill="#2563EB" />
+                <circle cx="74" cy="26" r="6" fill="#B93829" />
+                <path d="M68 36H80L84 58H64L68 36Z" fill="#B93829" />
+              </svg>
+            )}
+            {word.svgType === 'konbini' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#E1EFE6" />
+                <rect x="30" y="26" width="60" height="40" rx="3" fill="#FFFFFF" stroke="#D8D0C2" stroke-width="2" />
+                <rect x="30" y="26" width="60" height="10" fill="#F97316" />
+                <rect x="30" y="32" width="60" height="4" fill="#16A34A" />
+                <rect x="48" y="44" width="24" height="22" fill="#BAE6FD" />
+              </svg>
+            )}
+            {word.svgType === 'torii' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#FCEAE6" />
+                <path d="M28 24Q60 30 92 24" stroke="#B93829" stroke-width="6" stroke-linecap="round" />
+                <line x1="34" y1="36" x2="86" y2="36" stroke="#B93829" stroke-width="4" />
+                <line x1="42" y1="26" x2="42" y2="66" stroke="#B93829" stroke-width="5" />
+                <line x1="78" y1="26" x2="78" y2="66" stroke="#B93829" stroke-width="5" />
+              </svg>
+            )}
+            {word.svgType === 'fuji' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#FCEAE6" />
+                <circle cx="74" cy="28" r="10" fill="#B93829" />
+                <path d="M24 64L50 26H70L96 64H24Z" fill="#2B4C65" />
+                <path d="M45 34L50 26H70L75 34L66 38L60 33L54 38L45 34Z" fill="#FFFFFF" />
+              </svg>
+            )}
+            {word.svgType === 'yen' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="28" fill="#F9ECCF" stroke="#B48327" stroke-width="3" />
+                <circle cx="60" cy="42" r="7" fill="#FBF9F5" stroke="#B48327" stroke-width="2" />
+              </svg>
+            )}
+            {word.svgType === 'umbrella' && (
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="42" r="34" fill="#E0E7FF" />
+                <path d="M28 46C28 26 92 26 92 46H28Z" fill="#B93829" />
+                <path d="M60 46V62C60 66 54 66 54 62" stroke="#1D1B18" stroke-width="3" stroke-linecap="round" />
+              </svg>
+            )}
+          </div>
+
+          <div class="fcard-main-word">
+            <span class="fcard-giant-jp">
+              {word.usualForm === 'Katakana' ? word.katakana : word.kanji.split(' ')[0]}
+            </span>
+
+            <!-- Bloque de Significado y Fonética (se puede ocultar en modo "Estudiar sin ver") -->
+            <div class="revealable-answer-zone">
+              <div class="answer-content">
+                <h3 class="fcard-es-meaning">{word.es}</h3>
+                <div class="fcard-phonetic-pill">
+                  🇪🇸 Pronúncialo: <strong>"{word.esPhonetic}"</strong>
+                </div>
+              </div>
+
+              <button type="button" class="reveal-answer-btn">
+                👁️ Tocar para revelar significado y pronunciación
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 1: Las 4 Formas de Escritura (Conmutable) -->
+        <div class="scripts-comparison-panel">
+          <div class="panel-header-line">
+            <span class="panel-mini-title">🔤 Formas de escritura de esta palabra</span>
+          </div>
+          <div class="four-scripts-grid">
+            <div class={`script-tile ${word.usualForm === 'Kanji' ? 'highlight' : ''}`}>
+              <span class="s-label">Kanji (漢字)</span>
+              <strong class="s-val jp-serif">{word.kanji}</strong>
+            </div>
+            <div class={`script-tile ${word.usualForm === 'Hiragana' ? 'highlight' : ''}`}>
+              <span class="s-label">Hiragana (ひらがな)</span>
+              <strong class="s-val jp-serif">{word.hiragana}</strong>
+            </div>
+            <div class={`script-tile ${word.usualForm === 'Katakana' ? 'highlight' : ''}`}>
+              <span class="s-label">Katakana (カタカナ)</span>
+              <strong class="s-val jp-sans">{word.katakana}</strong>
+            </div>
+            <div class="script-tile">
+              <span class="s-label">Romaji</span>
+              <strong class="s-val">{word.romaji}</strong>
+            </div>
+          </div>
+          <p class="writing-context-note">💡 {word.writingNote}</p>
+        </div>
+
+        <!-- PANEL 2: Mnemotecnia para Facilitar la Memorización (Conmutable) -->
+        <div class="mnemonic-memory-panel">
+          <div class="mnemonic-icon-badge">🧠</div>
+          <div class="mnemonic-text-content">
+            <span class="mnemonic-eyebrow">TRUCO MNEMOTÉCNICO PARA RECORDARLA</span>
+            <p class="mnemonic-story">{word.mnemonic}</p>
+          </div>
+        </div>
+      </article>
+    ))}
+
+    <!-- Controles de Navegación y Evaluación Adaptativa de Flashcard -->
+    <div class="deck-navigation-bar">
+      <button type="button" class="deck-nav-btn" id="vword-prev-btn">
+        ← Anterior
+      </button>
+
+      <button type="button" class="deck-action-weak" id="vword-need-practice-btn" title="Marcar para repasar más seguido en tu JSON de progreso">
+        🎯 Necesito fortalecer
+      </button>
+
+      <button type="button" class="deck-action-memorized" id="vword-memorized-btn" title="Guardar como palabra dominada en tu JSON (+15 XP)">
+        💮 ¡La domino! (+15 XP)
+      </button>
+
+      <button type="button" class="deck-nav-btn" id="vword-next-btn">
+        Siguiente →
+      </button>
+    </div>
+
+    <!-- Puntos de salto rápido -->
+    <div class="quick-dots-strip" id="vword-dots-strip" aria-label="Saltar a palabra">
+      {VISUAL_COMMON_WORDS.map((w, idx) => (
+        <button
+          type="button"
+          class={`dot-jump ${idx === 0 ? 'active' : ''}`}
+          data-jump-vword={idx}
+          title={w.es}
+        >
+          {idx + 1}
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .visual-flashcard-section {
+    padding: 0.25rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  .study-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--md-secondary);
+    background: var(--md-secondary-container);
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-pill);
+    margin-bottom: 0.35rem;
+  }
+
+  .section-title {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+  }
+
+  .study-visibility-toggles {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .vis-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--md-outline);
+    background: var(--md-surface);
+    color: var(--md-on-surface-variant);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.18s ease;
+  }
+
+  .vis-chip.active {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    border-color: rgba(59, 100, 76, 0.35);
+  }
+
+  .category-progress-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Barra de 4 Niveles en Palabras Comunes Ilustradas */
+  .vword-levels-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.55rem;
+  }
+
+  .vw-level-tab {
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 0.85rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    transition: all 0.18s ease;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .vw-level-tab:hover {
+    border-color: var(--md-outline);
+    transform: translateY(-1px);
+  }
+
+  .vw-level-tab.active {
+    background: var(--md-paper);
+    border-color: var(--md-secondary);
+    box-shadow: 0 0 0 2px rgba(59, 100, 76, 0.15);
+  }
+
+  .vwl-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .vwl-num {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--md-muted);
+  }
+
+  .vw-level-tab.active .vwl-num {
+    color: var(--md-secondary);
+  }
+
+  .vwl-count {
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: var(--md-surface-low);
+    padding: 0.12rem 0.45rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .vwl-title {
+    font-size: 0.84rem;
+    color: var(--md-on-surface);
+  }
+
+  .vwl-bar {
+    width: 100%;
+    height: 5px;
+    background: var(--md-surface-container);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .vwl-fill {
+    height: 100%;
+    background: var(--md-secondary);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }
+
+  .level-tag-pill {
+    font-size: 0.72rem;
+    font-weight: 800;
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    padding: 0.24rem 0.65rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .v-cat-pills {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .v-cat-btn {
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--md-outline-variant);
+    background: var(--md-surface);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--md-on-surface-variant);
+  }
+
+  .v-cat-btn.active {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    border-color: var(--md-on-surface);
+  }
+
+  .deck-counter-pill {
+    font-size: 0.82rem;
+    color: var(--md-on-surface-variant);
+    background: var(--md-surface-low);
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+  }
+
+  /* ESCENARIO DE TARJETA ÚNICA */
+  .single-card-stage {
+    max-width: 820px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  .full-study-card {
+    display: none;
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-elevated);
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: fadeSlideUp 0.25s ease forwards;
+  }
+
+  .full-study-card.is-current {
+    display: flex;
+  }
+
+  .fcard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--md-outline-variant);
+  }
+
+  .usual-pill {
+    font-size: 0.78rem;
+    background: var(--md-surface-low);
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-pill);
+    color: var(--md-on-surface-variant);
+  }
+
+  .usual-pill strong {
+    color: var(--md-primary);
+  }
+
+  .fcard-audio-group {
+    display: flex;
+    gap: 0.45rem;
+  }
+
+  .v-audio-btn {
+    padding: 0.45rem 0.95rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--md-outline-variant);
+    background: var(--md-surface-low);
+  }
+
+  .v-audio-btn.primary {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    border-color: var(--md-on-surface);
+  }
+
+  .v-audio-btn.primary:hover {
+    background: var(--md-primary);
+    border-color: var(--md-primary);
+  }
+
+  .fcard-hero-grid {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: 1.75rem;
+    align-items: center;
+    padding: 0.5rem 0;
+  }
+
+  .fcard-illustration {
+    background: var(--md-surface-low);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fcard-illustration svg {
+    width: 145px;
+    height: 100px;
+  }
+
+  .fcard-main-word {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .fcard-giant-jp {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    font-weight: 700;
+    color: var(--md-on-surface);
+    line-height: 1.15;
+  }
+
+  /* Zona revelable (Modo Estudiar sin ver) */
+  .revealable-answer-zone {
+    position: relative;
+  }
+
+  .answer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .fcard-es-meaning {
+    font-family: var(--font-serif-jp);
+    font-size: 1.5rem;
+    color: var(--md-secondary);
+  }
+
+  .fcard-phonetic-pill {
+    display: inline-block;
+    align-self: flex-start;
+    background: var(--md-tertiary-container);
+    color: var(--md-on-surface);
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+  }
+
+  .reveal-answer-btn {
+    display: none;
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border-radius: var(--radius-md);
+    border: 1.5px dashed var(--md-primary);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .single-card-stage.blind-study-active .full-study-card:not(.answer-revealed) .answer-content {
+    display: none;
+  }
+
+  .single-card-stage.blind-study-active .full-study-card:not(.answer-revealed) .reveal-answer-btn {
+    display: block;
+  }
+
+  /* Panel de las 4 Escrituras */
+  .scripts-comparison-panel {
+    background: var(--md-bg);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .single-card-stage.hide-scripts-panel .scripts-comparison-panel {
+    display: none;
+  }
+
+  .panel-mini-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--md-muted);
+  }
+
+  .four-scripts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.65rem;
+  }
+
+  .script-tile {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .script-tile.highlight {
+    background: var(--md-primary-container);
+    border-color: rgba(185, 56, 41, 0.35);
+  }
+
+  .s-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--md-muted);
+  }
+
+  .script-tile.highlight .s-label {
+    color: var(--md-on-primary-container);
+  }
+
+  .s-val {
+    font-size: 1.1rem;
+    color: var(--md-on-surface);
+  }
+
+  .jp-serif {
+    font-family: var(--font-serif-jp);
+  }
+
+  .jp-sans {
+    font-family: var(--font-sans-jp);
+  }
+
+  .writing-context-note {
+    font-size: 0.82rem;
+    color: var(--md-on-surface-variant);
+  }
+
+  /* Panel de Mnemotecnia */
+  .mnemonic-memory-panel {
+    background: var(--md-grad-amber);
+    border: 1px solid #E5D0A1;
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  .single-card-stage.hide-mnemonic-panel .mnemonic-memory-panel {
+    display: none;
+  }
+
+  .mnemonic-icon-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(143, 100, 20, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .mnemonic-eyebrow {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--md-tertiary);
+    margin-bottom: 0.2rem;
+  }
+
+  .mnemonic-story {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--md-on-surface);
+    line-height: 1.45;
+  }
+
+  .fcard-meta-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .item-mastery-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+    background: var(--md-surface-low);
+    color: var(--md-muted);
+    border: 1px solid var(--md-outline-variant);
+  }
+
+  .item-mastery-badge[data-status='dominado'] {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    border-color: rgba(59, 100, 76, 0.35);
+  }
+
+  .item-mastery-badge[data-status='fortalecer'] {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border-color: rgba(185, 56, 41, 0.35);
+  }
+
+  .item-mastery-badge[data-status='aprendiendo'] {
+    background: var(--md-tertiary-container);
+    color: var(--md-tertiary);
+    border-color: rgba(143, 100, 20, 0.35);
+  }
+
+  .v-cat-btn.weak-filter-btn {
+    border-color: rgba(185, 56, 41, 0.35);
+    color: var(--md-primary);
+  }
+
+  .v-cat-btn.mastered-filter-btn {
+    border-color: rgba(59, 100, 76, 0.35);
+    color: var(--md-secondary);
+  }
+
+  .v-cat-btn.active {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    border-color: var(--md-on-surface);
+  }
+
+  /* Barra de Navegación Inferior */
+  .deck-navigation-bar {
+    display: grid;
+    grid-template-columns: 0.9fr 1.25fr 1.35fr 0.9fr;
+    gap: 0.65rem;
+  }
+
+  .deck-nav-btn {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline);
+    color: var(--md-on-surface);
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.86rem;
+    font-weight: 700;
+    transition: all 0.16s ease;
+  }
+
+  .deck-nav-btn:hover {
+    background: var(--md-surface-container);
+  }
+
+  .deck-action-weak {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border: 1px solid rgba(185, 56, 41, 0.35);
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.86rem;
+    font-weight: 700;
+    transition: all 0.16s ease;
+  }
+
+  .deck-action-weak:hover {
+    background: var(--md-primary);
+    color: var(--md-on-primary);
+  }
+
+  .deck-action-memorized {
+    background: var(--md-secondary);
+    color: var(--md-on-primary);
+    padding: 0.8rem 1.1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.86rem;
+    font-weight: 700;
+    transition: filter 0.18s ease, transform 0.15s ease;
+  }
+
+  .deck-action-memorized:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+
+  .quick-dots-strip {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 0.35rem;
+  }
+
+  .dot-jump {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    background: var(--md-surface-low);
+    color: var(--md-on-surface-variant);
+    border: 1.5px solid var(--md-outline-variant);
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+
+  .dot-jump:hover {
+    border-color: var(--md-secondary);
+    color: var(--md-on-surface);
+    transform: translateY(-1px);
+  }
+
+  .dot-jump.active {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    border-color: var(--md-on-surface);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 720px) {
+    .full-study-card {
+      padding: 1.35rem;
+    }
+
+    .fcard-hero-grid {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .fcard-phonetic-pill {
+      align-self: center;
+    }
+
+    .four-scripts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .deck-navigation-bar {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .deck-action-memorized {
+      grid-column: span 2;
+      order: -1;
+    }
+  }
+</style>

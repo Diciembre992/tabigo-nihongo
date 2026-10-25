@@ -1,0 +1,975 @@
+---
+import { KANA_TABLE_ROWS } from '../data/japaneseData';
+
+function getRowLevel(rowId: string): 'intro' | 'nivel-1' | 'nivel-2' | 'nivel-3' {
+  if (['row-v', 'row-k', 'row-s'].includes(rowId)) return 'intro';
+  if (['row-t', 'row-n', 'row-h'].includes(rowId)) return 'nivel-1';
+  if (['row-m', 'row-y', 'row-r', 'row-w'].includes(rowId)) return 'nivel-2';
+  return 'nivel-3';
+}
+---
+
+<section id="tabla-kana" class="kana-table-section">
+  <div class="section-header">
+    <div class="section-tag">五十音 · MATERIAL DE ESTUDIO INTERACTIVO POR NIVELES</div>
+    <h2 class="section-title">Tabla Dinámica de Hiragana, Katakana y Romaji</h2>
+    <p class="section-subtitle">
+      Domina las sílabas japonesas paso a paso del <strong>Nivel 0 (Introductorio)</strong> al <strong>Nivel 3 (Avanzado)</strong>. Haz clic en cualquier sílaba para escucharla o activa el <strong>Reto de Oído sin pistas</strong> sobre el nivel elegido.
+    </p>
+  </div>
+
+  <!-- BARRA DE 4 NIVELES DE APRENDIZAJE KANA -->
+  <div class="kana-levels-bar" role="tablist" aria-label="Niveles de aprendizaje Kana">
+    <button type="button" class="kn-level-tab active" data-kana-level-tab="all">
+      <div class="knl-top">
+        <span class="knl-num">Vista Completa</span>
+        <span class="knl-count" data-kana-lvl-count="all">0/71 💮</span>
+      </div>
+      <strong class="knl-title">Toda la Tabla Gojūon</strong>
+    </button>
+
+    <button type="button" class="kn-level-tab" data-kana-level-tab="intro">
+      <div class="knl-top">
+        <span class="knl-num">Nivel 0 · Intro</span>
+        <span class="knl-count" data-kana-lvl-count="intro">0/15 💮</span>
+      </div>
+      <strong class="knl-title">Vocales + Filas K y S</strong>
+    </button>
+
+    <button type="button" class="kn-level-tab" data-kana-level-tab="nivel-1">
+      <div class="knl-top">
+        <span class="knl-num">Nivel 1 · Básico</span>
+        <span class="knl-count" data-kana-lvl-count="nivel-1">0/15 💮</span>
+      </div>
+      <strong class="knl-title">Filas T, N y H</strong>
+    </button>
+
+    <button type="button" class="kn-level-tab" data-kana-level-tab="nivel-2">
+      <div class="knl-top">
+        <span class="knl-num">Nivel 2 · Intermedio</span>
+        <span class="knl-count" data-kana-lvl-count="nivel-2">0/16 💮</span>
+      </div>
+      <strong class="knl-title">Filas M, Y, R, W y N</strong>
+    </button>
+
+    <button type="button" class="kn-level-tab" data-kana-level-tab="nivel-3">
+      <div class="knl-top">
+        <span class="knl-num">Nivel 3 · Avanzado</span>
+        <span class="knl-count" data-kana-lvl-count="nivel-3">0/25 💮</span>
+      </div>
+      <strong class="knl-title">Sonidos G, Z, D, B y P</strong>
+    </button>
+  </div>
+
+  <!-- Barra de Controles Dinámicos (Material 3 Segmented Controls) -->
+  <div class="table-controls-bar">
+    <div class="control-pill-group" role="group" aria-label="Modo de escritura">
+      <button type="button" class="kana-mode-btn active" data-kana-view="both">
+        ⚖️ Ambos (あ · ア)
+      </button>
+      <button type="button" class="kana-mode-btn" data-kana-view="hiragana">
+        🌸 Hiragana (あ)
+      </button>
+      <button type="button" class="kana-mode-btn" data-kana-view="katakana">
+        🍜 Katakana (ア)
+      </button>
+    </div>
+
+    <div class="control-pill-group" role="group" aria-label="Grupo de sonidos">
+      <button type="button" class="kana-group-btn active" data-kana-group="gojuon">
+        Base (46)
+      </button>
+      <button type="button" class="kana-group-btn" data-kana-group="dakuten">
+        Comillas ゛/ ゜
+      </button>
+      <button type="button" class="kana-group-btn" data-kana-group="all">
+        Todos
+      </button>
+    </div>
+
+    <div class="right-table-actions">
+      <button
+        type="button"
+        class="kana-romaji-toggle-btn"
+        id="kana-toggle-romaji-btn"
+        aria-pressed="false"
+        title="Ocultar o mostrar el Romaji y las pistas de la tabla"
+      >
+        🙈 Ocultar Romaji
+      </button>
+
+      <button type="button" class="kana-ear-challenge-btn" id="kana-audio-quiz-btn">
+        🎧 Reto de Oído: ¿Cuál suena?
+      </button>
+    </div>
+  </div>
+
+  <!-- Banner de Reto de Oído (Modo Sin Pistas y Letras Mezcladas) -->
+  <div class="ear-challenge-banner" id="kana-ear-banner" hidden>
+    <div class="ear-banner-left">
+      <div class="ear-badge-row">
+        <span class="ear-badge">🎧 RETO DE OÍDO SIN PISTAS</span>
+        <span class="ear-sub-pill">Romaji oculto · Hiragana y Katakana mezclados</span>
+      </div>
+      <p id="kana-ear-prompt">Escucha el sonido y haz clic en la letra correcta...</p>
+    </div>
+
+    <div class="ear-banner-actions">
+      <button type="button" class="ear-replay-btn" id="kana-ear-replay">
+        🔊 Repetir sonido
+      </button>
+      <button
+        type="button"
+        class="ear-shuffle-btn active"
+        id="kana-ear-shuffle-toggle"
+        title="Alternar entre letras mezcladas al azar o tabla sin pistas"
+      >
+        🔀 Mezcladas: Sí
+      </button>
+      <button type="button" class="ear-close-btn" id="kana-ear-close">
+        Salir del reto
+      </button>
+    </div>
+  </div>
+
+  <div class="kana-study-layout" id="kana-study-layout">
+    <!-- Columna Izquierda: Tabla Gojūon Ordenada + Tablero Mezclado para Reto de Oído -->
+    <div class="kana-grid-card" id="kana-grid-card">
+      <!-- Cabecera de Vocales (se oculta en modo sin pistas) -->
+      <div class="vowel-columns-header" id="kana-vowel-header">
+        <span class="row-col-spacer">Fila</span>
+        <span class="v-col">A</span>
+        <span class="v-col">I</span>
+        <span class="v-col">U</span>
+        <span class="v-col">E</span>
+        <span class="v-col">O</span>
+      </div>
+
+      <!-- Vista 1: Filas ordenadas Gojūon -->
+      <div class="kana-rows-container" id="kana-rows-container" data-view-mode="both">
+        {KANA_TABLE_ROWS.map((row) => (
+          <div
+            class="kana-row"
+            data-row-group={row.group}
+            data-row-level={getRowLevel(row.id)}
+            style={row.group === 'dakuten' ? 'display: none;' : ''}
+          >
+            <div class="row-label-box" title={row.consonantHint}>
+              <strong class="r-title">{row.rowLabel}</strong>
+              <span class="r-hint">{row.consonantHint}</span>
+            </div>
+
+            <div class="row-cells-grid">
+              {row.cells.map((cell) =>
+                cell ? (
+                  <button
+                    type="button"
+                    class={`kana-cell ${cell.romaji === 'a' ? 'selected' : ''}`}
+                    data-hira={cell.hira}
+                    data-kata={cell.kata}
+                    data-romaji={cell.romaji}
+                    data-essound={cell.esSound}
+                    data-exjp={cell.exampleJp}
+                    data-exromaji={cell.exampleRomaji}
+                    data-exes={cell.exampleEs}
+                  >
+                    <div class="cell-scripts">
+                      <span class="c-hira">{cell.hira}</span>
+                      <span class="c-kata">{cell.kata}</span>
+                    </div>
+                    <span class="c-romaji">{cell.romaji}</span>
+                  </button>
+                ) : (
+                  <div class="kana-cell-empty" aria-hidden="true">·</div>
+                )
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Vista 2: Tablero Mezclado de Hiragana y Katakana Sin Pistas (Activo en Reto de Oído) -->
+      <div class="kana-shuffled-board" id="kana-shuffled-board" hidden>
+        <!-- Generado dinámicamente al mezclar las casillas activas -->
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Inspector Comparativo (Oculta pistas durante la pregunta del Reto de Oído) -->
+    <aside class="kana-inspector-card" id="kana-inspector">
+      <!-- Estado Misterio mientras buscas la letra en el Reto de Oído -->
+      <div class="inspector-mystery-cover" id="kana-inspector-mystery" hidden>
+        <div class="mystery-circle">👂</div>
+        <h4>Modo Sin Pistas Activo</h4>
+        <p>Escucha el sonido y toca la letra en <strong>Hiragana</strong> o <strong>Katakana</strong> que corresponda.</p>
+        <button type="button" class="mystery-replay-btn" id="mystery-replay-btn">
+          🔊 Volver a escuchar sonido
+        </button>
+      </div>
+
+      <!-- Contenido normal del Inspector -->
+      <div class="inspector-normal-content" id="kana-inspector-content">
+        <div class="inspector-top">
+          <span class="inspector-eyebrow">COMPARADOR DE ESCRITURA</span>
+          <button type="button" class="inspector-speak-btn" id="inspector-speak-kana">
+            🔊 Escuchar sílaba
+          </button>
+        </div>
+
+        <div class="dual-script-showcase">
+          <div class="script-box hira-box">
+            <span class="script-tag">Hiragana (Curvo)</span>
+            <strong class="big-char" id="insp-hira">あ</strong>
+            <small>Palabras nativas y gramática</small>
+          </div>
+
+          <div class="script-box kata-box">
+            <span class="script-tag">Katakana (Recto)</span>
+            <strong class="big-char" id="insp-kata">ア</strong>
+            <small>Palabras extranjeras y menús</small>
+          </div>
+        </div>
+
+        <div class="romaji-sound-box">
+          <div class="romaji-pill-row">
+            <span>Romaji: <strong id="insp-romaji">a</strong></span>
+            <span class="divider">·</span>
+            <span>Sonido ES: <strong id="insp-essound">a clara</strong></span>
+          </div>
+        </div>
+
+        <div class="example-word-card">
+          <span class="ex-label">Ejemplo de uso real:</span>
+          <div class="ex-main">
+            <div>
+              <strong class="ex-jp" id="insp-ex-jp">あさ (朝)</strong>
+              <span class="ex-romaji" id="insp-ex-romaji">Asa — Mañana</span>
+            </div>
+            <button type="button" class="ex-audio-btn" id="inspector-speak-example" title="Escuchar palabra de ejemplo">
+              🔊 Palabra
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .kana-table-section {
+    padding: 0.5rem 0;
+  }
+
+  .section-header {
+    max-width: 720px;
+    margin-bottom: 1.35rem;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--md-primary);
+    background: var(--md-primary-container);
+    padding: 0.25rem 0.7rem;
+    border-radius: var(--radius-pill);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    font-family: var(--font-serif-jp);
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    margin-bottom: 0.45rem;
+  }
+
+  .section-subtitle {
+    color: var(--md-on-surface-variant);
+    font-size: 0.94rem;
+  }
+
+  /* Barra de Niveles Progresivos Kana */
+  .kana-levels-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .kn-level-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.55rem 0.65rem;
+    background: var(--md-surface);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-md);
+    text-align: left;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .kn-level-tab:hover {
+    border-color: var(--md-primary);
+    transform: translateY(-1px);
+  }
+
+  .kn-level-tab.active {
+    background: var(--md-primary-container);
+    border-color: var(--md-primary);
+    box-shadow: 0 3px 10px rgba(185, 28, 28, 0.1);
+  }
+
+  .knl-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .knl-num {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--md-primary);
+    text-transform: uppercase;
+  }
+
+  .knl-count {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--md-on-surface-variant);
+    background: var(--md-surface-container);
+    padding: 0.08rem 0.35rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .knl-title {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--md-on-surface);
+  }
+
+  /* Controles */
+  .table-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+
+  .control-pill-group {
+    display: inline-flex;
+    background: var(--md-surface-container);
+    padding: 0.25rem;
+    border-radius: var(--radius-pill);
+    gap: 0.2rem;
+    flex-wrap: wrap;
+  }
+
+  .kana-mode-btn,
+  .kana-group-btn {
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--md-on-surface-variant);
+    transition: all 0.18s ease;
+  }
+
+  .kana-mode-btn.active,
+  .kana-group-btn.active {
+    background: var(--md-surface);
+    color: var(--md-on-surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .right-table-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .kana-romaji-toggle-btn {
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--md-outline);
+    background: var(--md-surface);
+    color: var(--md-on-surface-variant);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.18s ease;
+  }
+
+  .kana-romaji-toggle-btn.active {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    border-color: var(--md-on-surface);
+  }
+
+  .kana-ear-challenge-btn {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    padding: 0.55rem 1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: filter 0.18s ease;
+  }
+
+  .kana-ear-challenge-btn:hover {
+    filter: brightness(0.95);
+  }
+
+  .ear-challenge-banner {
+    background: var(--md-secondary-container);
+    border: 1px solid rgba(59, 100, 76, 0.3);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 1.25rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .ear-challenge-banner[hidden],
+  .kana-shuffled-board[hidden],
+  .inspector-mystery-cover[hidden],
+  .inspector-normal-content[hidden] {
+    display: none !important;
+  }
+
+  .ear-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.2rem;
+  }
+
+  .ear-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--md-secondary);
+    letter-spacing: 0.06em;
+  }
+
+  .ear-sub-pill {
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: var(--md-glass);
+    color: var(--md-on-secondary-container);
+    padding: 0.1rem 0.55rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .ear-banner-left p {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--md-on-secondary-container);
+  }
+
+  .ear-banner-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .ear-replay-btn {
+    background: var(--md-secondary);
+    color: var(--md-on-primary);
+    padding: 0.45rem 0.95rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .ear-shuffle-btn {
+    background: var(--md-surface);
+    color: var(--md-on-surface);
+    border: 1px solid var(--md-outline);
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .ear-shuffle-btn.active {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    border-color: var(--md-on-surface);
+  }
+
+  .ear-close-btn {
+    background: var(--md-glass);
+    color: var(--md-on-surface);
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Layout Principal */
+  .kana-study-layout {
+    display: grid;
+    grid-template-columns: 1.35fr 0.75fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .kana-grid-card {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .vowel-columns-header {
+    display: grid;
+    grid-template-columns: 130px repeat(5, 1fr);
+    gap: 0.5rem;
+    padding-bottom: 0.65rem;
+    margin-bottom: 0.65rem;
+    border-bottom: 1px solid var(--md-outline-variant);
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--md-muted);
+  }
+
+  .row-col-spacer {
+    text-align: left;
+    padding-left: 0.35rem;
+  }
+
+  .kana-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .kana-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .row-label-box {
+    display: flex;
+    flex-direction: column;
+    padding-right: 0.35rem;
+  }
+
+  .r-title {
+    font-size: 0.84rem;
+    color: var(--md-on-surface);
+  }
+
+  .r-hint {
+    font-size: 0.68rem;
+    color: var(--md-muted);
+    line-height: 1.25;
+  }
+
+  .row-cells-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.45rem;
+  }
+
+  .kana-cell {
+    background: var(--md-bg);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    transition: all 0.16s ease;
+    min-height: 64px;
+  }
+
+  .kana-cell:hover {
+    border-color: var(--md-primary);
+    background: var(--md-paper);
+    transform: translateY(-2px);
+  }
+
+  .kana-cell.selected {
+    background: var(--md-primary-container);
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 2px rgba(185, 56, 41, 0.12);
+  }
+
+  .cell-scripts {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+  }
+
+  .c-hira {
+    font-family: var(--font-serif-jp);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--md-on-surface);
+  }
+
+  .c-kata {
+    font-family: var(--font-sans-jp);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--md-secondary);
+  }
+
+  /* Modos de visualización */
+  .kana-rows-container[data-view-mode="hiragana"] .c-kata {
+    display: none;
+  }
+
+  .kana-rows-container[data-view-mode="hiragana"] .c-hira {
+    font-size: 1.5rem;
+  }
+
+  .kana-rows-container[data-view-mode="katakana"] .c-hira {
+    display: none;
+  }
+
+  .kana-rows-container[data-view-mode="katakana"] .c-kata {
+    font-size: 1.5rem;
+    color: var(--md-on-surface);
+  }
+
+  .c-romaji {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--md-primary);
+    text-transform: lowercase;
+  }
+
+  /* Ocultar Romaji y Pistas cuando está activo el modo sin pistas */
+  .kana-grid-card.no-hints-mode .c-romaji,
+  .kana-grid-card.no-hints-mode .r-hint,
+  .kana-grid-card.no-hints-mode .vowel-columns-header {
+    display: none !important;
+  }
+
+  .kana-grid-card.no-hints-mode .r-title {
+    font-size: 0.75rem;
+    color: var(--md-muted);
+  }
+
+  /* TABLERO MEZCLADO SIN PISTAS (HIRAGANA Y KATAKANA MEZCLADAS) */
+  .kana-shuffled-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 0.55rem;
+  }
+
+  :global(.shuffled-kana-tile) {
+    background: var(--md-bg);
+    border: 1.5px solid var(--md-outline-variant);
+    border-radius: var(--radius-sm);
+    min-height: 68px;
+    padding: 0.5rem 0.3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+
+  :global(.shuffled-kana-tile:hover) {
+    border-color: var(--md-primary);
+    background: var(--md-paper);
+    transform: translateY(-2px);
+  }
+
+  :global(.shuffled-kana-tile.correct-hit) {
+    background: var(--md-secondary-container);
+    border-color: var(--md-secondary);
+    transform: scale(1.06);
+  }
+
+  :global(.shuffled-kana-tile.wrong-hit) {
+    background: var(--md-primary-container);
+    border-color: var(--md-primary);
+  }
+
+  :global(.shuf-main-char) {
+    font-family: var(--font-serif-jp);
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--md-on-surface);
+    line-height: 1.1;
+  }
+
+  :global(.shuf-sub-char) {
+    font-family: var(--font-sans-jp);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--md-secondary);
+  }
+
+  .kana-cell-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--md-outline);
+    background: rgba(239, 234, 225, 0.35);
+    border-radius: var(--radius-sm);
+    min-height: 64px;
+  }
+
+  /* Inspector Card */
+  .kana-inspector-card {
+    position: sticky;
+    top: 88px;
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .inspector-normal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .inspector-mystery-cover {
+    text-align: center;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .mystery-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--md-secondary-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+
+  .inspector-mystery-cover h4 {
+    font-family: var(--font-serif-jp);
+    font-size: 1.2rem;
+  }
+
+  .inspector-mystery-cover p {
+    font-size: 0.88rem;
+    color: var(--md-on-surface-variant);
+  }
+
+  .mystery-replay-btn {
+    margin-top: 0.35rem;
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    padding: 0.6rem 1.15rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .inspector-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .inspector-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--md-muted);
+  }
+
+  .inspector-speak-btn {
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .inspector-speak-btn:hover {
+    background: var(--md-primary);
+  }
+
+  .dual-script-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .script-box {
+    border-radius: var(--radius-md);
+    padding: 1rem 0.75rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .hira-box {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+  }
+
+  .kata-box {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+
+  .script-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .big-char {
+    font-family: var(--font-serif-jp);
+    font-size: 2.8rem;
+    line-height: 1.15;
+  }
+
+  .kata-box .big-char {
+    font-family: var(--font-sans-jp);
+  }
+
+  .script-box small {
+    font-size: 0.68rem;
+    opacity: 0.85;
+  }
+
+  .romaji-sound-box {
+    background: var(--md-surface-low);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  .romaji-pill-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .example-word-card {
+    border-top: 1px solid var(--md-outline-variant);
+    padding-top: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .ex-label {
+    font-size: 0.75rem;
+    color: var(--md-muted);
+    font-weight: 600;
+  }
+
+  .ex-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--md-bg);
+    border: 1px solid var(--md-outline-variant);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .ex-jp {
+    display: block;
+    font-family: var(--font-serif-jp);
+    font-size: 1.2rem;
+  }
+
+  .ex-romaji {
+    font-size: 0.82rem;
+    color: var(--md-on-surface-variant);
+  }
+
+  .ex-audio-btn {
+    background: var(--md-surface-container);
+    color: var(--md-on-surface);
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .ex-audio-btn:hover {
+    background: var(--md-primary);
+    color: var(--md-on-primary);
+  }
+
+  @media (max-width: 900px) {
+    .kana-levels-bar {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .kana-study-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .kana-inspector-card {
+      position: static;
+      order: -1;
+      padding: 1.15rem;
+    }
+
+    .vowel-columns-header {
+      display: none;
+    }
+
+    .kana-row {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--md-outline-variant);
+    }
+
+    .kana-grid-card {
+      padding: 0.9rem;
+    }
+
+    .row-cells-grid {
+      gap: 0.35rem;
+    }
+
+    .kana-cell {
+      min-height: 54px;
+      padding: 0.35rem 0.15rem;
+    }
+
+    .c-hira {
+      font-size: 1.1rem;
+    }
+
+    .c-kata {
+      font-size: 0.9rem;
+    }
+  }
+</style>
