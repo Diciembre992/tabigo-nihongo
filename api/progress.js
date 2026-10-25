@@ -74,3 +74,4 @@ export default async function handler(req, res) {
     res.end(JSON.stringify({ error: 'Progress API error', details: String(err) }));
   }
 }
+

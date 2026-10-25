@@ -9,7 +9,8 @@
     "serve": "astro build && node server.mjs",
     "build": "astro build",
     "preview": "node server.mjs",
-    "tunnel": "cloudflared tunnel --url http://localhost:4325"
+    "tunnel": "cloudflared tunnel --url http://localhost:4325",
+    "deploy": "npx vercel --prod"
   },
   "dependencies": {
     "astro": "^5.1.0"
